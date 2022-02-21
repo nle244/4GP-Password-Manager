@@ -1,0 +1,13 @@
+# user's github credentials 
+.git-credentials 
+
+# pip logs 
+pip-log.txt
+pip-selfcheck.json
+
+# build artifacts
+__pycache__
+
+# macOS
+.DS_Store 
+
