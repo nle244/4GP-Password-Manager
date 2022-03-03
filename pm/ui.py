@@ -31,7 +31,7 @@ class MainWindow(tk.Tk):
         label1 = tk.Label(self, font=("Arial",25), text="Welcome")
         label1.place(relx=.5, y= 50, anchor=tk.CENTER)
 
-        homebutton1 = tk.Button(self, text="New Database", command = newbuttonclick)
+        homebutton1 = tk.Button(self, text="New Database", command = self.newbuttonclick)
         homebutton1.place(x=150, y= 200)
 
         homebutton2 = tk.Button(self, text="Open Database", command= self.load_filepath)
@@ -87,10 +87,7 @@ class MainWindow(tk.Tk):
             test_table.insert("", tk.END, text="Title", values=(f.read()))
         test_table.place(x= 100, y=40)
 
-       
-
-
-#UI Functions
-def newbuttonclick():
-    f = asksaveasfile(initialfile = 'newDatabase.txt', 
-        defaultextension = '.txt', filetypes = [("All Files","*.*")])
+    #Initialize a new database and save to computer
+    def newbuttonclick():
+        f = asksaveasfile(initialfile = 'newDatabase.txt', 
+            defaultextension = '.txt', filetypes = [("All Files","*.*")])
