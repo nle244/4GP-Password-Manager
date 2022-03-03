@@ -88,6 +88,10 @@ class MainWindow(tk.Tk):
         test_table.place(x= 100, y=40)
 
     #Initialize a new database and save to computer
-    def newbuttonclick():
+    def newbuttonclick(self, *args):
         f = asksaveasfile(initialfile = 'newDatabase.txt', 
             defaultextension = '.txt', filetypes = [("All Files","*.*")])
+        #self._file_path.set(filename)
+        self.clear_frame()
+        self._create_db_table()
+
