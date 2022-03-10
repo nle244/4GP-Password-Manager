@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import filedialog
 from pathlib import Path
 from tkinter.filedialog import asksaveasfile
+import csv
 
 
 proj_name = 'Password Manager'
@@ -44,12 +45,12 @@ class MainWindow(tk.Tk):
     def load_filepath(self, *args):
 
         filetypes = (
-            ('Text files', '*.txt *.text'),
+            ('Database files', '*.csv'),
             ('All files', '.*')
         )
 
         filename = filedialog.askopenfilename(
-            title='Choose a file',
+            title='Choose a file.',
             initialdir=Path.home(),
             filetypes=filetypes
         )
@@ -84,7 +85,14 @@ class MainWindow(tk.Tk):
         test_table.heading("URL", text="URL", anchor=tk.CENTER)
         test_table.heading("Last_Modified", text="Last_Modified", anchor=tk.CENTER)
         with open(self._file_path.get(), "r") as f:
-            test_table.insert("", tk.END, text="Title", values=(f.read()))
+            reader = csv.DictReader(f, delimiter=',')
+            for row in reader:
+                title = row['Title']
+                username = row['Username']
+                password = row['Password']
+                url = row['URL']
+                last_modified = row['Last_Modified']
+                test_table.insert("", tk.END, values=(title, username, password, url, last_modified))
         test_table.place(x= 100, y=40)
 
     #Initialize a new database and save to computer
