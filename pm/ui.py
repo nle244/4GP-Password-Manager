@@ -55,9 +55,12 @@ class MainWindow(tk.Tk):
             initialdir=Path.home(),
             filetypes=filetypes
         )
-       
-        self._file_path.set(filename)
-        self._create_db_table()
+        if (filename!= ''):
+            self._file_path.set(filename)
+            self._create_db_table()
+        else:
+            return
+
         
             
 
