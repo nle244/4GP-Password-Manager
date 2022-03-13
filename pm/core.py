@@ -20,7 +20,6 @@ class QuickKey(tk.Tk):
 
 
     def __setup_ui(self):
-        print('loading ui')
         self.title(PROJ_NAME)
 
         self.resizable(0,0)

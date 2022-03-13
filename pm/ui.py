@@ -12,7 +12,6 @@ proj_name = 'Password Manager'
 #Main window of Password Manager UI
 class MainWindow(ttk.Frame):
     def __init__(self, parent):
-        print('loading frame')
         super().__init__(parent)
 
         self.__create_home_widgets()
@@ -33,7 +32,6 @@ class MainWindow(ttk.Frame):
 
     #Initial layout just to get started; may need to organize into frames later on
     def __create_home_widgets(self):
-        print('loading widgets')
         self.label1 = ttk.Label(self, font=("Arial",25), text="Welcome")
         self.label1.grid(row=0, column=0)
         #label1.place(relx=.5, y= 50, anchor=tk.CENTER)
