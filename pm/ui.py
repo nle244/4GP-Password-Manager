@@ -5,7 +5,7 @@ from tkinter import messagebox
 from pathlib import Path
 from tkinter.filedialog import asksaveasfile
 import csv
-
+import platform
 
 proj_name = 'Password Manager'
 
@@ -17,7 +17,8 @@ class MainWindow(tk.Tk):
         self.title(proj_name) 
         self.geometry("600x300")
         self.resizable(0,0)
-        self.attributes('-toolwindow', True)
+        if platform.system() == 'Windows':
+            self.attributes('-toolwindow', True)
         self._file_path = tk.StringVar()
 
         self.columnconfigure(0, weight=1)
