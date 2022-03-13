@@ -1,6 +1,7 @@
-import pm.core
+from pm.core import QuickKey
 
 
 
 if __name__ == "__main__":
-    pm.core.main()
+    qk = QuickKey()
+    qk.mainloop()
