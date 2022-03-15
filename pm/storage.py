@@ -2,6 +2,7 @@ import os
 import csv
 
 from pm.exceptions import (
+    InvalidColumns,
     InvalidFileFormat,
 )
 
@@ -32,6 +33,21 @@ class Storage:
     def db(self):
         '''Dictionary containing all paswords.'''
         return self.__db
+
+
+    def add_entry(self, entry: dict):
+        '''Add a new entry to the database in memory.
+        Params
+            entry: Dictionary object containing a new entry.
+        Raises
+            InvalidColumns if the column values are wrong.
+        '''
+        if sorted(entry.keys()) == sorted(HEADER):
+            self.db.append(entry)
+        else:
+            msg = ' '.join(entry.keys())
+            raise InvalidColumns('Invalid column values: {}'.format(msg))
+
 
 
     def load(self):

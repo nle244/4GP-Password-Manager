@@ -1,6 +1,8 @@
 from pm.ui import MainWindow
 from pm.storage import Storage
+from pm.storage import HEADER
 from pm.exceptions import (
+    InvalidColumns,
     InvalidFileFormat,
 )
 
@@ -16,6 +18,19 @@ class Controller:
         '''
         self.__ui = ui
         self.__storage = storage
+
+
+    def add_entry(self, entry: dict):
+        '''Tell Storage to add a new entry to the database in memory.
+        Tell MainWindow to render an error message if column values are wrong.
+        Params
+            entry: Dictionary containing a new entry.
+        '''
+        try:
+            self.__storage.add_entry(entry)
+        except InvalidColumns as e:
+            self.__ui.show_error(str(e))
+
 
 
     def save(self):

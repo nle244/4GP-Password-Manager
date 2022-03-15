@@ -53,3 +53,21 @@ class Test_Storage_load:
         storage.filename = db_path
         storage.load()
         assert storage.db == db
+
+
+class Test_Storage_add_entry:
+    correct = {header: '{} test value'.format(header) for header in HEADER}
+    incorrect = {header + '_wrong': '{} test value'.format(header) for header in HEADER}
+
+    def test_add_entry_fail(self, mvc):
+        storage, mainwindow, controller = mvc
+
+        with pytest.raises(exceptions.InvalidColumns):
+            storage.add_entry(self.incorrect)
+
+
+    def test_add_entry_success(self, mvc):
+        storage, mainwindow, controller = mvc
+
+        storage.add_entry(self.correct)
+        assert storage.db[-1] == self.correct
