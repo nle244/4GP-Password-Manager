@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
 from pathlib import Path
-from tkinter.filedialog import asksaveasfile
+from tkinter.filedialog import asksaveasfilename
 import csv
 
 
@@ -21,7 +21,7 @@ class MainWindow(ttk.Frame):
     @property
     def ctrl(self):
         '''Controller.'''
-        return self.ctrl
+        return self.__ctrl
 
 
     @ctrl.setter
@@ -111,10 +111,13 @@ class MainWindow(ttk.Frame):
 
     #Initialize a new database and save to computer
     def newbuttonclick(self, *args):
-        f = asksaveasfile(initialfile = 'newDatabase.txt', 
-            defaultextension = '.txt', filetypes = [("All Files","*.*")])
+        default = 'newDatabase.csv'
+        filename = asksaveasfilename(initialfile=default,
+            defaultextension = '.csv', filetypes = [("All Files","*.*")])
         self.clear_frame()
-        self._create_db_table()
+        self.ctrl.set_filename(filename)
+        self.ctrl.save()
+        self.ctrl.load()
 
 
     def __save_database(self):
