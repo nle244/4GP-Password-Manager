@@ -8,6 +8,9 @@ pip-selfcheck.json
 # build artifacts
 __pycache__
 
+# test artifacts
+.pytest_cache
+
 # macOS
 .DS_Store 
 
