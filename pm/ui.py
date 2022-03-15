@@ -6,6 +6,10 @@ from pathlib import Path
 from tkinter.filedialog import asksaveasfilename
 import csv
 
+# Allow code-completion tools to check Controller syntax
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pm.controller import Controller
 
 proj_name = 'Password Manager'
 
@@ -19,7 +23,7 @@ class MainWindow(ttk.Frame):
 
     
     @property
-    def ctrl(self):
+    def ctrl(self) -> 'Controller':
         '''Controller.'''
         return self.__ctrl
 
