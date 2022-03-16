@@ -49,6 +49,16 @@ class Storage:
             raise InvalidColumns('Invalid column values: {}'.format(msg))
 
 
+    def edit_entry(self, old_entry: dict, new_entry: dict):
+        '''Edit an existing entry.
+        Params
+            old_entry: Dictionary containing an existing entry.
+            new_entry: Dictionary containing values to replace old_entry with.
+        '''
+        idx = self.db.index(old_entry)
+        self.db[idx] = new_entry
+
+
 
     def load(self):
         '''Load the password file.

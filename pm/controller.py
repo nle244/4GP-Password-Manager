@@ -32,6 +32,14 @@ class Controller:
             self.__ui.show_error(str(e))
 
 
+    def edit_entry(self, old_entry: dict, new_entry: dict):
+        '''Tell Storage to edit an existing entry.
+        Params
+            old_entry: Dictionary containing an existing entry.
+            new_entry: Dictionary containing values to replace old_entry with.
+        '''
+        self.__storage.edit_entry(old_entry, new_entry)
+
 
     def save(self):
         '''Tell Storage to save the database to disk.'''
