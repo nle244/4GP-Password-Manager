@@ -49,6 +49,15 @@ class Storage:
             raise InvalidColumns('Invalid column values: {}'.format(msg))
 
 
+    def delete_entry(self, entry: dict):
+        '''Delete an existing entry from the database in memory.
+        Params
+            entry: Dictionary containing the entry to delete.
+        '''
+        idx = self.db.index(entry)
+        self.db.remove(entry)
+
+
     def edit_entry(self, old_entry: dict, new_entry: dict):
         '''Edit an existing entry.
         Params

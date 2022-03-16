@@ -32,6 +32,14 @@ class Controller:
             self.__ui.show_error(str(e))
 
 
+    def delete_entry(self, entry: dict):
+        '''Tell Storage to delete an existing entry.
+        Params
+            entry: Dictionary containing the entry to delete.
+        '''
+        self.__storage.delete_entry(entry)
+
+
     def edit_entry(self, old_entry: dict, new_entry: dict):
         '''Tell Storage to edit an existing entry.
         Params
