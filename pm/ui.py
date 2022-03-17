@@ -237,7 +237,7 @@ class MainWindow(ttk.Frame):
 
         entry = dict()
         for key, value in zip(self.test_table['columns'], selected):
-                entry[key] = value
+                entry[key] = str(value)
         
         form_fields = dict()
 
