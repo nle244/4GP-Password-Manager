@@ -1,9 +1,10 @@
 import tkinter as tk 
-from tkinter import ttk
-from tkinter import filedialog
-from tkinter import messagebox
+from tkinter import ttk, filedialog, messagebox
+from tkinter import *
 from pathlib import Path
+from datetime import datetime
 from tkinter.filedialog import asksaveasfilename
+
 import csv
 
 # Allow code-completion tools to check Controller syntax
@@ -48,10 +49,10 @@ class MainWindow(ttk.Frame):
         self.homebutton2.grid(row=1, column=1)
         #homebutton2.place(x =350, y=200)
 
+        
     
 
     #Asks for a file to use from user, in this case a database file
-    #For test purposes, text files are currently being used
     def load_filepath(self, *args):
 
         filetypes = (
@@ -81,7 +82,7 @@ class MainWindow(ttk.Frame):
     
 
 
-    #Create a table which will read data from the database file once decrypted for use
+    #Creates the table view which will read data from the database file once decrypted for use
     def create_db_table(self, db):
         self.clear_frame()
         test_table = ttk.Treeview(self)
@@ -108,8 +109,22 @@ class MainWindow(ttk.Frame):
             test_table.insert("", tk.END, values=(title, username, password, url, last_modified))
 
         test_table.grid(row=0, column=0)
-        save_button = ttk.Button(self, text="Save Database", command= self.__save_database)
-        save_button.grid(row=1, column=0)
+        
+        
+        
+        toolbar = tk.Frame(self.master, bd=1)
+        eimg = PhotoImage(file='plus.png')
+        save_button = ttk.Button(toolbar, text="Save", width ="4",command= self.__save_database)
+        save_button.grid(row=0, column=0)
+        addButton = ttk.Button(toolbar, text="Add", image=eimg,width="3.5", command=self.add_entry) #Need a way to view icons to make it look nicer
+        addButton.grid(row=0,column=1)
+        #editButton = ttk.Button(toolbar, text="Edit" ,width="4")# command= self.__ctrl.edit_entry())
+        #editButton.grid(row=0, column=2)
+        #deleteButton = ttk.Button(toolbar, text="Delete" ,width="6") # command= self.__ctrl.delete_entry()))
+        #deleteButton.grid(row=0, column=3)
+        
+        
+        toolbar.place(x=0,y=0)
 
 
 
@@ -123,12 +138,50 @@ class MainWindow(ttk.Frame):
         self.ctrl.save()
         self.ctrl.load()
 
-
+    #Saves the database with the current values displayed
     def __save_database(self):
         '''Tell Controller to save the database to disk.'''
         self.__ctrl.save()
 
 
+    #Adds a new entry to the database table using values inputted by the user
+    #Needs some polishing on UI and cleanup in certain parts of function
+    #Table needs to be "refreshed" in order to properly reflect changes done; added data does not show on table immediately
+    def add_entry(self):
+        newwin = Toplevel(self)
+        newwin.geometry("300x300")
+        newwin.focus()
+        form_fields = {
+            "Title": "", 
+            "Username": "", 
+            "Password": "", 
+            "URL": "", 
+            "Last_Modified": ""
+        }
+
+        titleentry = Entry(newwin, width = 25)
+        titleentry.grid(row=0, column=0, pady=5)
+        userentry = Entry(newwin, width = 25)
+        userentry.grid(row=1, column=0, pady=5)
+        passentry = Entry(newwin, width = 25)
+        passentry.grid(row=2, column=0, pady=5)
+        urlentry = Entry(newwin, width = 25)
+        urlentry.grid(row=3, column=0, pady=5)
+        
+        #Obtains the user input and stores the values into a Dictionary entry to pass to Controller add_entry
+        def get_input():
+            form_fields["Title"] = titleentry.get()
+            form_fields["Username"] = userentry.get()
+            form_fields["Password"] = passentry.get()
+            form_fields["URL"] = urlentry.get()
+            form_fields["Last_Modified"] = datetime.now()
+
+        
+
+        submitButton = ttk.Button(newwin, text="Submit", command= lambda:[get_input(),self.__ctrl.add_entry(form_fields), self.show_info('Entry has been added.'), newwin.destroy()])
+        submitButton.grid(row=5, column=0)
+
+   
     def show_error(self, message):
         '''Show an error message dialog.
 
@@ -145,9 +198,3 @@ class MainWindow(ttk.Frame):
             message: Message to dispaly in the dialog.
         '''
         messagebox.showinfo('Info', message)
-
-
-    #def addEntry(self, *args):
-
-
-    #def editEntry(self, *args):
