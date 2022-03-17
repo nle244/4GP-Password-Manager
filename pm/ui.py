@@ -174,10 +174,12 @@ class MainWindow(ttk.Frame):
         default = 'newDatabase.csv'
         filename = asksaveasfilename(initialfile=default,
             defaultextension = '.csv', filetypes = [("All Files","*.*")])
-        self.clear_frame()
-        self.ctrl.set_filename(filename)
-        self.ctrl.save()
-        self.ctrl.load()
+            
+        if filename != None and filename != '':
+            self.__ctrl.set_filename(filename)
+            self.__ctrl.save()
+            self.__ctrl.load()
+
 
     #Saves the database with the current values displayed
     def __save_database(self):
