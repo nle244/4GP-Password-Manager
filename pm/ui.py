@@ -118,8 +118,8 @@ class MainWindow(ttk.Frame):
         save_button.grid(row=0, column=0)
         addButton = ttk.Button(toolbar, text="Add", image=eimg,width="3.5", command=self.add_entry) #Need a way to view icons to make it look nicer
         addButton.grid(row=0,column=1)
-        #editButton = ttk.Button(toolbar, text="Edit" ,width="4") # command= self.__ctrl.edit_entry())
-        #editButton.grid(row=0, column=2)
+        editButton = ttk.Button(toolbar, text="Edit" ,width="4") # command= self.__ctrl.edit_entry())
+        editButton.grid(row=0, column=2)
         #deleteButton = ttk.Button(toolbar, text="Delete" ,width="6") # command= self.__ctrl.delete_entry()))
         #deleteButton.grid(row=0, column=3)
         
