@@ -49,21 +49,6 @@ class MainWindow(ttk.Frame):
         self.homebutton2.grid(row=1, column=1)
         #homebutton2.place(x =350, y=200)
 
-    def __create_table_widgets(self):
-        toolbar = tk.Frame(self.master, bd=1)
-        eimg = PhotoImage(file='plus.png')
-        save_button = ttk.Button(toolbar, text="Save", width ="4",command= self.__save_database)
-        save_button.grid(row=0, column=0)
-        addButton = ttk.Button(toolbar, text="Add", image=eimg,width="3.5", command=self.add_entry) #Need a way to view icons to make it look nicer
-        addButton.grid(row=0,column=1)
-        editButton = ttk.Button(toolbar, text="Edit" ,width="4") # command= self.__ctrl.edit_entry())
-        editButton.grid(row=0, column=2)
-        deleteButton = ttk.Button(toolbar, text="Delete" ,width="6") # command= self.__ctrl.delete_entry()))
-        deleteButton.grid(row=0, column=3)
-        
-        
-        toolbar.place(x=0,y=0)
-        
     
 
     #Asks for a file to use from user, in this case a database file
@@ -83,7 +68,6 @@ class MainWindow(ttk.Frame):
         if filename != None and filename != '':
             self.__ctrl.set_filename(filename)
             self.__ctrl.load()
-            self.__create_table_widgets()
 
         
             
@@ -101,7 +85,7 @@ class MainWindow(ttk.Frame):
     def create_db_table(self, db):
         self.clear_frame()
         test_table = ttk.Treeview(self)
-        test_table.grid(row=1, column=1, padx=20, pady=20)
+        test_table.grid(row=1, column=0, padx=20, pady=20)
         test_table['columns'] = ('Title', 'Username', 'Password', 'URL', 'Last_Modified')
         test_table['show'] = 'headings'
         test_table.column("Title", anchor=tk.CENTER, width=50)
@@ -123,7 +107,19 @@ class MainWindow(ttk.Frame):
             last_modified = row['Last_Modified']
             test_table.insert("", tk.END, values=(title, username, password, url, last_modified))
 
-        test_table.grid(row=0, column=0)
+        toolbar = ttk.Frame(self)
+        eimg = PhotoImage(file='plus.png')
+        save_button = ttk.Button(toolbar, text="Save", width ="4",command= self.__save_database)
+        save_button.grid(row=0, column=0)
+        addButton = ttk.Button(toolbar, text="Add", image=eimg,width="3.5", command=self.add_entry) #Need a way to view icons to make it look nicer
+        addButton.grid(row=0,column=1)
+        editButton = ttk.Button(toolbar, text="Edit" ,width="4") # command= self.__ctrl.edit_entry())
+        editButton.grid(row=0, column=2)
+        deleteButton = ttk.Button(toolbar, text="Delete" ,width="6") # command= self.__ctrl.delete_entry()))
+        deleteButton.grid(row=0, column=3)
+        
+        
+        toolbar.grid(row=0,column=0)
         
 
 
@@ -137,7 +133,6 @@ class MainWindow(ttk.Frame):
         self.ctrl.set_filename(filename)
         self.ctrl.save()
         self.ctrl.load()
-        self.__create_table_widgets()
 
     #Saves the database with the current values displayed
     def __save_database(self):
