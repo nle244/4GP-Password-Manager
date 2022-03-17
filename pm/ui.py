@@ -49,6 +49,20 @@ class MainWindow(ttk.Frame):
         self.homebutton2.grid(row=1, column=1)
         #homebutton2.place(x =350, y=200)
 
+    def __create_table_widgets(self):
+        toolbar = tk.Frame(self.master, bd=1)
+        eimg = PhotoImage(file='plus.png')
+        save_button = ttk.Button(toolbar, text="Save", width ="4",command= self.__save_database)
+        save_button.grid(row=0, column=0)
+        addButton = ttk.Button(toolbar, text="Add", image=eimg,width="3.5", command=self.add_entry) #Need a way to view icons to make it look nicer
+        addButton.grid(row=0,column=1)
+        editButton = ttk.Button(toolbar, text="Edit" ,width="4") # command= self.__ctrl.edit_entry())
+        editButton.grid(row=0, column=2)
+        deleteButton = ttk.Button(toolbar, text="Delete" ,width="6") # command= self.__ctrl.delete_entry()))
+        deleteButton.grid(row=0, column=3)
+        
+        
+        toolbar.place(x=0,y=0)
         
     
 
@@ -69,6 +83,7 @@ class MainWindow(ttk.Frame):
         if filename != None and filename != '':
             self.__ctrl.set_filename(filename)
             self.__ctrl.load()
+            self.__create_table_widgets()
 
         
             
@@ -110,21 +125,6 @@ class MainWindow(ttk.Frame):
 
         test_table.grid(row=0, column=0)
         
-        
-        
-        toolbar = tk.Frame(self.master, bd=1)
-        eimg = PhotoImage(file='plus.png')
-        save_button = ttk.Button(toolbar, text="Save", width ="4",command= self.__save_database)
-        save_button.grid(row=0, column=0)
-        addButton = ttk.Button(toolbar, text="Add", image=eimg,width="3.5", command=self.add_entry) #Need a way to view icons to make it look nicer
-        addButton.grid(row=0,column=1)
-        editButton = ttk.Button(toolbar, text="Edit" ,width="4") # command= self.__ctrl.edit_entry())
-        editButton.grid(row=0, column=2)
-        deleteButton = ttk.Button(toolbar, text="Delete" ,width="6") # command= self.__ctrl.delete_entry()))
-        deleteButton.grid(row=0, column=3)
-        
-        
-        toolbar.place(x=0,y=0)
 
 
 
@@ -137,6 +137,7 @@ class MainWindow(ttk.Frame):
         self.ctrl.set_filename(filename)
         self.ctrl.save()
         self.ctrl.load()
+        self.__create_table_widgets()
 
     #Saves the database with the current values displayed
     def __save_database(self):
@@ -181,7 +182,7 @@ class MainWindow(ttk.Frame):
 
         
 
-        submitButton = ttk.Button(newwin, text="Submit", command= lambda:[get_input(),self.__ctrl.add_entry(form_fields), self.show_info('Entry has been added.'), newwin.destroy()])
+        submitButton = ttk.Button(newwin, text="Submit", command= lambda:[get_input(),self.__ctrl.add_entry(form_fields), self.show_info('Entry has been added.'), newwin.destroy(), self.__ctrl.refresh_table()])
         submitButton.grid(row=5, column=0, pady= 5)
 
         cancelButton = ttk.Button(newwin, text="Cancel", command=lambda:[newwin.destroy()])

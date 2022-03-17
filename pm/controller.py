@@ -74,6 +74,11 @@ class Controller:
         db = self.__storage.db
         self.__ui.create_db_table(db)
 
+    def refresh_table(self):
+        '''Tell UI to populate its table view with the database.'''
+        db = self.__storage.db
+        self.__ui.create_db_table(db)
+
 
     def set_filename(self, fname):
         '''Tell Storage to set the filename.
