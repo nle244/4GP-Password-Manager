@@ -120,8 +120,8 @@ class MainWindow(ttk.Frame):
         addButton.grid(row=0,column=1)
         editButton = ttk.Button(toolbar, text="Edit" ,width="4") # command= self.__ctrl.edit_entry())
         editButton.grid(row=0, column=2)
-        #deleteButton = ttk.Button(toolbar, text="Delete" ,width="6") # command= self.__ctrl.delete_entry()))
-        #deleteButton.grid(row=0, column=3)
+        deleteButton = ttk.Button(toolbar, text="Delete" ,width="6") # command= self.__ctrl.delete_entry()))
+        deleteButton.grid(row=0, column=3)
         
         
         toolbar.place(x=0,y=0)
