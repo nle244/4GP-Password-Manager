@@ -188,55 +188,59 @@ class MainWindow(ttk.Frame):
 
     #Edits specified row from the table and update it with new values
     def edit_entry(self, Treeview):
-        newwin = Toplevel(self)
-        newwin.geometry("300x150")
-        newwin.focus()
+        try:
+            newwin = Toplevel(self)
+            newwin.geometry("300x150")
+            newwin.focus()
         
-        select = Treeview.selection()[0]
+            select = Treeview.selection()[0]
         
-        old_values = {
+            old_values = {
                 "Title": Treeview.item(select)['values'][0], 
                 "Username": Treeview.item(select)['values'][1], 
                 "Password": Treeview.item(select)['values'][2], 
                 "URL": Treeview.item(select)['values'][3], 
                 "Last_Modified": Treeview.item(select)['values'][4]
+                }
+            form_fields = {
+                "Title": "", 
+                "Username": "", 
+                "Password": "", 
+                "URL": "", 
+                "Last_Modified": ""
             }
-        form_fields = {
-            "Title": "", 
-            "Username": "", 
-            "Password": "", 
-            "URL": "", 
-            "Last_Modified": ""
-        }
-        Label(newwin, text="Title").grid(row=0, column=0, padx=5)
-        titleentry = Entry(newwin, width = 25)
-        titleentry.grid(row=0, column=1, pady=5)
-        Label(newwin, text="Username").grid(row=1, column=0, padx=5)
-        userentry = Entry(newwin, width = 25)
-        userentry.grid(row=1, column=1, pady=5)
-        Label(newwin, text="Password").grid(row=2, column=0, padx=5)
-        passentry = Entry(newwin, width = 25)
-        passentry.grid(row=2, column=1, pady=5)
-        Label(newwin, text="URL").grid(row=3, column=0, padx=5)
-        urlentry = Entry(newwin, width = 25)
-        urlentry.grid(row=3, column=1, pady=5)
+            Label(newwin, text="Title").grid(row=0, column=0, padx=5)
+            titleentry = Entry(newwin, width = 25)
+            titleentry.grid(row=0, column=1, pady=5)
+            Label(newwin, text="Username").grid(row=1, column=0, padx=5)
+            userentry = Entry(newwin, width = 25)
+            userentry.grid(row=1, column=1, pady=5)
+            Label(newwin, text="Password").grid(row=2, column=0, padx=5)
+            passentry = Entry(newwin, width = 25)
+            passentry.grid(row=2, column=1, pady=5)
+            Label(newwin, text="URL").grid(row=3, column=0, padx=5)
+            urlentry = Entry(newwin, width = 25)
+            urlentry.grid(row=3, column=1, pady=5)
         
-        #Obtains the user input and stores the values into a Dictionary entry to pass to Controller add_entry
-        def get_input():
-            date = str(datetime.now())
-            form_fields["Title"] = titleentry.get()
-            form_fields["Username"] = userentry.get()
-            form_fields["Password"] = passentry.get()
-            form_fields["URL"] = urlentry.get()
-            form_fields["Last_Modified"] = date
+            #Obtains the user input and stores the values into a Dictionary entry to pass to Controller add_entry
+            def get_input():
+                date = str(datetime.now())
+                form_fields["Title"] = titleentry.get()
+                form_fields["Username"] = userentry.get()
+                form_fields["Password"] = passentry.get()
+                form_fields["URL"] = urlentry.get()
+                form_fields["Last_Modified"] = date
 
         
 
-        submitButton = ttk.Button(newwin, text="Submit", command= lambda:[get_input(),self.__ctrl.edit_entry(old_values, form_fields), self.show_info('Entry has been updated.'), newwin.destroy()])
-        submitButton.grid(row=5, column=0, pady= 5)
+            submitButton = ttk.Button(newwin, text="Submit", command= lambda:[get_input(),self.__ctrl.edit_entry(old_values, form_fields), self.show_info('Entry has been updated.'), newwin.destroy()])
+            submitButton.grid(row=5, column=0, pady= 5)
 
-        cancelButton = ttk.Button(newwin, text="Cancel", command=lambda:[newwin.destroy()])
-        cancelButton.grid(row=5, column=2, pady= 5)
+            cancelButton = ttk.Button(newwin, text="Cancel", command=lambda:[newwin.destroy()])
+            cancelButton.grid(row=5, column=2, pady= 5)
+        except:
+            self.show_error('No row has been selected.')
+            newwin.destroy()
 
     #Deletes specified row from the table and removes its entry from the database
     #UI needs work
