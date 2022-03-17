@@ -1,8 +1,10 @@
+from cgi import test
 import tkinter as tk 
 from tkinter import ttk, filedialog, messagebox
 from tkinter import *
 from pathlib import Path
 from datetime import datetime
+from functools import partial
 from tkinter.filedialog import asksaveasfilename
 
 import csv
@@ -113,7 +115,7 @@ class MainWindow(ttk.Frame):
         save_button.grid(row=0, column=0)
         addButton = ttk.Button(toolbar, text="Add", image=eimg,width="3.5", command=self.add_entry) #Need a way to view icons to make it look nicer
         addButton.grid(row=0,column=1)
-        editButton = ttk.Button(toolbar, text="Edit" ,width="4") # command= self.__ctrl.edit_entry())
+        editButton = ttk.Button(toolbar, text="Edit" ,width="4", command= partial(self.edit_entry, test_table))
         editButton.grid(row=0, column=2)
         deleteButton = ttk.Button(toolbar, text="Delete" ,width="6") # command= self.__ctrl.delete_entry()))
         deleteButton.grid(row=0, column=3)
@@ -178,6 +180,55 @@ class MainWindow(ttk.Frame):
         
 
         submitButton = ttk.Button(newwin, text="Submit", command= lambda:[get_input(),self.__ctrl.add_entry(form_fields), self.show_info('Entry has been added.'), newwin.destroy()])
+        submitButton.grid(row=5, column=0, pady= 5)
+
+        cancelButton = ttk.Button(newwin, text="Cancel", command=lambda:[newwin.destroy()])
+        cancelButton.grid(row=5, column=2, pady= 5)
+
+    def edit_entry(self, Treeview):
+        newwin = Toplevel(self)
+        newwin.geometry("300x150")
+        newwin.focus()
+        select = Treeview.selection()[0]
+        
+        old_values = {
+                "Title": Treeview.item(select)['values'][0], 
+                "Username":Treeview.item(select)['values'][1], 
+                "Password": Treeview.item(select)['values'][2], 
+                "URL":Treeview.item(select)['values'][3], 
+                "Last_Modified": Treeview.item(select)['values'][4]
+            }
+        form_fields = {
+            "Title": "", 
+            "Username": "", 
+            "Password": "", 
+            "URL": "", 
+            "Last_Modified": ""
+        }
+        Label(newwin, text="Title").grid(row=0, column=0, padx=5)
+        titleentry = Entry(newwin, width = 25)
+        titleentry.grid(row=0, column=1, pady=5)
+        Label(newwin, text="Username").grid(row=1, column=0, padx=5)
+        userentry = Entry(newwin, width = 25)
+        userentry.grid(row=1, column=1, pady=5)
+        Label(newwin, text="Password").grid(row=2, column=0, padx=5)
+        passentry = Entry(newwin, width = 25)
+        passentry.grid(row=2, column=1, pady=5)
+        Label(newwin, text="URL").grid(row=3, column=0, padx=5)
+        urlentry = Entry(newwin, width = 25)
+        urlentry.grid(row=3, column=1, pady=5)
+        
+        #Obtains the user input and stores the values into a Dictionary entry to pass to Controller add_entry
+        def get_input():
+            form_fields["Title"] = titleentry.get()
+            form_fields["Username"] = userentry.get()
+            form_fields["Password"] = passentry.get()
+            form_fields["URL"] = urlentry.get()
+            form_fields["Last_Modified"] = datetime.now()
+
+        
+
+        submitButton = ttk.Button(newwin, text="Submit", command= lambda:[get_input(),self.__ctrl.edit_entry(old_values, form_fields), self.show_info('Entry has been added.'), newwin.destroy()])
         submitButton.grid(row=5, column=0, pady= 5)
 
         cancelButton = ttk.Button(newwin, text="Cancel", command=lambda:[newwin.destroy()])
