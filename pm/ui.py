@@ -177,7 +177,7 @@ class MainWindow(ttk.Frame):
 
         
 
-        submitButton = ttk.Button(newwin, text="Submit", command= lambda:[get_input(),self.__ctrl.add_entry(form_fields), self.show_info('Entry has been added.'), newwin.destroy(), self.__ctrl.refresh_table()])
+        submitButton = ttk.Button(newwin, text="Submit", command= lambda:[get_input(),self.__ctrl.add_entry(form_fields), self.show_info('Entry has been added.'), newwin.destroy()])
         submitButton.grid(row=5, column=0, pady= 5)
 
         cancelButton = ttk.Button(newwin, text="Cancel", command=lambda:[newwin.destroy()])

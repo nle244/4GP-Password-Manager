@@ -28,6 +28,7 @@ class Controller:
         '''
         try:
             self.__storage.add_entry(entry)
+            self.__populate_table()
         except InvalidColumns as e:
             self.__ui.show_error(str(e))
 
@@ -38,6 +39,7 @@ class Controller:
             entry: Dictionary containing the entry to delete.
         '''
         self.__storage.delete_entry(entry)
+        self.__populate_table()
 
 
     def edit_entry(self, old_entry: dict, new_entry: dict):
@@ -47,6 +49,7 @@ class Controller:
             new_entry: Dictionary containing values to replace old_entry with.
         '''
         self.__storage.edit_entry(old_entry, new_entry)
+        self.__populate_table()
 
 
     def save(self):
@@ -70,11 +73,6 @@ class Controller:
 
 
     def __populate_table(self):
-        '''Tell UI to populate its table view with the database.'''
-        db = self.__storage.db
-        self.__ui.create_db_table(db)
-
-    def refresh_table(self):
         '''Tell UI to populate its table view with the database.'''
         db = self.__storage.db
         self.__ui.create_db_table(db)
