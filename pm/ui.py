@@ -117,8 +117,8 @@ class MainWindow(ttk.Frame):
         addButton.grid(row=0,column=1)
         editButton = ttk.Button(toolbar, text="Edit" ,width="4", command= partial(self.edit_entry, test_table))
         editButton.grid(row=0, column=2)
-        #deleteButton = ttk.Button(toolbar, text="Delete" ,width="6", command= partial(self.__ctrl.delete_entry, test_table))
-        #deleteButton.grid(row=0, column=3)
+        deleteButton = ttk.Button(toolbar, text="Delete" ,width="6", command= partial(self.delete_entry, test_table))
+        deleteButton.grid(row=0, column=3)
         
         
         toolbar.grid(row=0,column=0)
@@ -144,7 +144,6 @@ class MainWindow(ttk.Frame):
 
     #Adds a new entry to the database table using values inputted by the user
     #Needs some polishing on UI and cleanup in certain parts of function
-    #Table needs to be "refreshed" in order to properly reflect changes done; added data does not show on table immediately
     def add_entry(self):
         newwin = Toplevel(self)
         newwin.geometry("300x150")
@@ -186,6 +185,8 @@ class MainWindow(ttk.Frame):
         cancelButton = ttk.Button(newwin, text="Cancel", command=lambda:[newwin.destroy()])
         cancelButton.grid(row=5, column=2, pady= 5)
 
+
+    #Edits specified row from the table and update it with new values
     def edit_entry(self, Treeview):
         newwin = Toplevel(self)
         newwin.geometry("300x150")
@@ -237,7 +238,31 @@ class MainWindow(ttk.Frame):
         cancelButton = ttk.Button(newwin, text="Cancel", command=lambda:[newwin.destroy()])
         cancelButton.grid(row=5, column=2, pady= 5)
 
-    
+    #Deletes specified row from the table and removes its entry from the database
+    #UI needs work
+    def delete_entry(self, Treeview):
+        newwin = Toplevel(self)
+        newwin.geometry("300x100")
+        newwin.focus()
+        select = Treeview.selection()[0]
+        
+        selected_values = {
+                "Title": Treeview.item(select)['values'][0], 
+                "Username":Treeview.item(select)['values'][1], 
+                "Password": Treeview.item(select)['values'][2], 
+                "URL":Treeview.item(select)['values'][3], 
+                "Last_Modified": Treeview.item(select)['values'][4]
+            }
+        
+        Label(newwin, text="Are you sure you want to delete this entry?").grid(row=0, column=0, padx=5, pady=5)
+
+        
+
+        submitButton = ttk.Button(newwin, text="Submit", command= lambda:[self.__ctrl.delete_entry(selected_values), self.show_info('Entry has been deleted.'), newwin.destroy()])
+        submitButton.grid(row=1, column=0, pady= 5)
+
+        cancelButton = ttk.Button(newwin, text="Cancel", command=lambda:[newwin.destroy()])
+        cancelButton.grid(row=1, column=1, pady= 5)
 
    
     def show_error(self, message):
