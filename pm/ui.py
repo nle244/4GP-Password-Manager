@@ -117,8 +117,8 @@ class MainWindow(ttk.Frame):
         addButton.grid(row=0,column=1)
         editButton = ttk.Button(toolbar, text="Edit" ,width="4", command= partial(self.edit_entry, test_table))
         editButton.grid(row=0, column=2)
-        deleteButton = ttk.Button(toolbar, text="Delete" ,width="6") # command= self.__ctrl.delete_entry()))
-        deleteButton.grid(row=0, column=3)
+        #deleteButton = ttk.Button(toolbar, text="Delete" ,width="6", command= partial(self.__ctrl.delete_entry, test_table))
+        #deleteButton.grid(row=0, column=3)
         
         
         toolbar.grid(row=0,column=0)
@@ -171,11 +171,12 @@ class MainWindow(ttk.Frame):
         
         #Obtains the user input and stores the values into a Dictionary entry to pass to Controller add_entry
         def get_input():
+            date = str(datetime.now())
             form_fields["Title"] = titleentry.get()
             form_fields["Username"] = userentry.get()
             form_fields["Password"] = passentry.get()
             form_fields["URL"] = urlentry.get()
-            form_fields["Last_Modified"] = datetime.now()
+            form_fields["Last_Modified"] = date
 
         
 
@@ -189,13 +190,14 @@ class MainWindow(ttk.Frame):
         newwin = Toplevel(self)
         newwin.geometry("300x150")
         newwin.focus()
+        
         select = Treeview.selection()[0]
         
         old_values = {
                 "Title": Treeview.item(select)['values'][0], 
-                "Username":Treeview.item(select)['values'][1], 
+                "Username": Treeview.item(select)['values'][1], 
                 "Password": Treeview.item(select)['values'][2], 
-                "URL":Treeview.item(select)['values'][3], 
+                "URL": Treeview.item(select)['values'][3], 
                 "Last_Modified": Treeview.item(select)['values'][4]
             }
         form_fields = {
@@ -220,19 +222,22 @@ class MainWindow(ttk.Frame):
         
         #Obtains the user input and stores the values into a Dictionary entry to pass to Controller add_entry
         def get_input():
+            date = str(datetime.now())
             form_fields["Title"] = titleentry.get()
             form_fields["Username"] = userentry.get()
             form_fields["Password"] = passentry.get()
             form_fields["URL"] = urlentry.get()
-            form_fields["Last_Modified"] = datetime.now()
+            form_fields["Last_Modified"] = date
 
         
 
-        submitButton = ttk.Button(newwin, text="Submit", command= lambda:[get_input(),self.__ctrl.edit_entry(old_values, form_fields), self.show_info('Entry has been added.'), newwin.destroy()])
+        submitButton = ttk.Button(newwin, text="Submit", command= lambda:[get_input(),self.__ctrl.edit_entry(old_values, form_fields), self.show_info('Entry has been updated.'), newwin.destroy()])
         submitButton.grid(row=5, column=0, pady= 5)
 
         cancelButton = ttk.Button(newwin, text="Cancel", command=lambda:[newwin.destroy()])
         cancelButton.grid(row=5, column=2, pady= 5)
+
+    
 
    
     def show_error(self, message):
