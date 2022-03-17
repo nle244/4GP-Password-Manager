@@ -245,28 +245,32 @@ class MainWindow(ttk.Frame):
     #Deletes specified row from the table and removes its entry from the database
     #UI needs work
     def delete_entry(self, Treeview):
-        newwin = Toplevel(self)
-        newwin.geometry("300x100")
-        newwin.focus()
-        select = Treeview.selection()[0]
+        try:
+            newwin = Toplevel(self)
+            newwin.geometry("300x100")
+            newwin.focus()
+            select = Treeview.selection()[0]
         
-        selected_values = {
+            selected_values = {
                 "Title": Treeview.item(select)['values'][0], 
                 "Username":Treeview.item(select)['values'][1], 
                 "Password": Treeview.item(select)['values'][2], 
                 "URL":Treeview.item(select)['values'][3], 
                 "Last_Modified": Treeview.item(select)['values'][4]
-            }
+                }
         
-        Label(newwin, text="Are you sure you want to delete this entry?").grid(row=0, column=0, padx=5, pady=5)
+            Label(newwin, text="Are you sure you want to delete this entry?").grid(row=0, column=0, padx=5, pady=5)
 
         
 
-        submitButton = ttk.Button(newwin, text="Submit", command= lambda:[self.__ctrl.delete_entry(selected_values), self.show_info('Entry has been deleted.'), newwin.destroy()])
-        submitButton.grid(row=1, column=0, pady= 5)
+            submitButton = ttk.Button(newwin, text="Submit", command= lambda:[self.__ctrl.delete_entry(selected_values), self.show_info('Entry has been deleted.'), newwin.destroy()])
+            submitButton.grid(row=1, column=0, pady= 5)
 
-        cancelButton = ttk.Button(newwin, text="Cancel", command=lambda:[newwin.destroy()])
-        cancelButton.grid(row=1, column=1, pady= 5)
+            cancelButton = ttk.Button(newwin, text="Cancel", command=lambda:[newwin.destroy()])
+            cancelButton.grid(row=1, column=1, pady= 5)
+        except:
+            self.show_error('No row has been selected.')
+            newwin.destroy()
 
    
     def show_error(self, message):
@@ -282,6 +286,6 @@ class MainWindow(ttk.Frame):
         '''Show an info dialog.
 
         Params
-            message: Message to dispaly in the dialog.
+            message: Message to display in the dialog.
         '''
         messagebox.showinfo('Info', message)

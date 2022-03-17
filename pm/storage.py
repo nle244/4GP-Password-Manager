@@ -31,7 +31,7 @@ class Storage:
 
     @property
     def db(self):
-        '''Dictionary containing all paswords.'''
+        '''Dictionary containing all passwords.'''
         return self.__db
 
 
