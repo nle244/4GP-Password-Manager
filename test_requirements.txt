@@ -1,2 +1,3 @@
 # packages needed for testing
 pytest
+pycryptodome
