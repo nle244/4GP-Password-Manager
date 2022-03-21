@@ -20,6 +20,10 @@ class Test_Storage_filename:
 
 
 class Test_Storage_load:
+    temp_db = [
+        {header: '{} test value {}'.format(header, i) for header in HEADER}
+        for i in range(3)
+    ]
 
     def test_load_fail(self, mvc, tmp_path, filename):
         '''Check if load() raises all the proper exceptions'''
@@ -35,39 +39,56 @@ class Test_Storage_load:
 
 
     def test_load_success(self, mvc, tmp_path, filename):
-        storage, mainwindow, controller = mvc 
+        storage, mainwindow, controller = mvc
 
-        # create and write a temporary database file
-        db_path = tmp_path / filename
-        db = []
-        for i in range(10):
-            db.append(dict())
-            for header in HEADER:
-                db[-1][header] = '{} test value'.format(header)
-        with open(db_path, 'w') as f:
-            writer = csv.DictWriter(f, fieldnames=HEADER)
-            writer.writeheader()
-            for row in db:
-                writer.writerow(row)
-        
-        storage.filename = db_path
+        # set passwd and initialize
+        storage.filename = tmp_path / filename
+        storage.set_password('very secure')
+        storage.save()
         storage.load()
-        assert storage.db == db
+
+        # add test entries
+        for entry in self.temp_db:
+            storage.add_entry(entry)
+
+        # write it to disk
+        storage.save()
+
+        # load it
+        storage.load()
+
+        # check it
+        for entry in storage.db:
+            assert entry in self.temp_db
 
 
 class Test_Storage_add_entry:
     correct = {header: '{} test value'.format(header) for header in HEADER}
     incorrect = {header + '_wrong': '{} test value'.format(header) for header in HEADER}
 
-    def test_add_entry_fail(self, mvc):
+    def test_add_entry_fail(self, mvc, tmp_path, filename):
         storage, mainwindow, controller = mvc
 
+        # set passwd and initialize
+        storage.filename = tmp_path / filename
+        storage.set_password('extremely secure')
+        storage.save()
+        storage.load()
+
+        # this should be caught
         with pytest.raises(exceptions.InvalidColumns):
             storage.add_entry(self.incorrect)
 
 
-    def test_add_entry_success(self, mvc):
+    def test_add_entry_success(self, mvc, tmp_path, filename):
         storage, mainwindow, controller = mvc
 
+        # set passwd and initialize
+        storage.filename = tmp_path / filename
+        storage.set_password('cheese grater')
+        storage.save()
+        storage.load()
+
+        # shouldn't raise any exceptions
         storage.add_entry(self.correct)
         assert storage.db[-1] == self.correct
