@@ -22,7 +22,7 @@ class Storage:
         self.filename = filename
         self.__plaintext_db = []            # populated only with @encryption
         self.__crypto = Cryptography()
-        self.__db = self.__crypto.encrypt(pickle.dumps([]))
+        self.__db = b''
 
 
     def encryption(func):
@@ -34,11 +34,11 @@ class Storage:
             self.__plaintext_db = pickle.loads(plaintext_bytes)
 
             # run func
-            result = func(self, *args, **kwargs)
+            result = func(self, *args, **kwargs)   # type: ignore
 
             # encrypt database
             plaintext_bytes = pickle.dumps(self.__plaintext_db)
-            self.__db = [self.__crypto.encrypt(plaintext_bytes)]
+            self.__db = self.__crypto.encrypt(plaintext_bytes)
 
             # destroy plaintext
             del plaintext_bytes, self.__plaintext_db
@@ -128,7 +128,11 @@ class Storage:
 
     def save(self):
         '''Save the database to disk. Creates a new file if it doesn't exist already.'''
-        # no need for @encryption, just write it as raw bytes
+        # saving for the first time?
+        if self.__db == b'':
+            self.__db = self.__crypto.encrypt(pickle.dumps([]))
+
+        # just write it as raw bytes
         with open(self.filename, 'wb') as f:
             f.write(self.__crypto.params + self.__db)
 
