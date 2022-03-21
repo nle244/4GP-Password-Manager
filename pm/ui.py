@@ -80,7 +80,7 @@ class MainWindow(ttk.Frame):
 
         if filename != None and filename != '':
             self.__ctrl.set_filename(filename)
-            self.__ctrl.load()
+            self.ctrl.load(ask_passwd=True)
 
         
             
@@ -308,17 +308,19 @@ class MainWindow(ttk.Frame):
         messagebox.showinfo('Info', message)
 
 
-    def show_password_dialog(self):
-        return PasswordDialog(self).get()
+    def show_password_dialog(self, message):
+        return PasswordDialog(self, message).get()
 
 
 
 class PasswordDialog(Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, message):
         super().__init__(parent)
         self.__passwd = StringVar()
-        self.__render()
+        self.__msg = message
         self.__submit = False
+
+        self.__render()
 
 
     def __render(self):
@@ -331,7 +333,8 @@ class PasswordDialog(Toplevel):
         self.__view = ttk.Frame(self)
         self.__view.grid(row=0, column=0)
         self.__view['padding'] = (10, 10, 10, 10)
-        ttk.Label(self.__view, text='Type in your master password.\nDo not forget this!'
+        ttk.Label(
+            self.__view, text=self.__msg
         ).grid(row=0, column=0)
         ttk.Entry(
             self.__view, show='*', textvariable=self.__passwd

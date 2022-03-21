@@ -50,7 +50,8 @@ class Cryptography:
             self.__salt = get_random_bytes(SALTLEN)
         key = PBKDF2(
             self.__passwd_hash,         # type: ignore
-            self.__salt, KEYLEN,
+            self.__salt,
+            KEYLEN,
             count=ROUNDS,
             hmac_hash_module=SHA512
         )
@@ -62,10 +63,19 @@ class Cryptography:
 
         Params
             ciphertext: bytes object containing ciphertext.
+        Raises
+            ValueError if password is incorrect or password database has been tampered with.
         Returns
             plaintext: bytes object containing decrypted values.
         '''
-        return b''
+        if self.__nonce == b'' or self.__mac == b'':
+            raise ValueError('Decryption failed: Not enough cryptographic parameters.')
+        key = self.__derive_key()
+
+        cipher = AES.new(key, AES.MODE_EAX, nonce=self.__nonce, mac_len=MACLEN)
+        plaintext = cipher.decrypt_and_verify(ciphertext, self.__mac)  # type: ignore
+        del key
+        return plaintext
 
 
     def encrypt(self, plaintext: bytes) -> bytes:
