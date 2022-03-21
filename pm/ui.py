@@ -4,10 +4,9 @@ from tkinter import ttk, filedialog, messagebox
 from tkinter import *
 from pathlib import Path
 from datetime import datetime
-from functools import partial
 from tkinter.filedialog import asksaveasfilename
 
-import csv
+import platform
 
 # Allow code-completion tools to check Controller syntax
 from typing import TYPE_CHECKING
@@ -176,9 +175,7 @@ class MainWindow(ttk.Frame):
             defaultextension = '.csv', filetypes = [("All Files","*.*")])
             
         if filename != None and filename != '':
-            self.__ctrl.set_filename(filename)
-            self.__ctrl.save()
-            self.__ctrl.load()
+            self.ctrl.new_database(filename)
 
 
     #Saves the database with the current values displayed
@@ -309,3 +306,63 @@ class MainWindow(ttk.Frame):
             message: Message to display in the dialog.
         '''
         messagebox.showinfo('Info', message)
+
+
+    def show_password_dialog(self):
+        return PasswordDialog(self).get()
+
+
+
+class PasswordDialog(Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.__passwd = StringVar()
+        self.__render()
+        self.__submit = False
+
+
+    def __render(self):
+        self.title('Master Password')
+        if platform.system() == 'Windows':
+            self.attributes('-toolwindow', True)
+        self.columnconfigure(0, weight=1)
+        self.resizable(width=False, height=False)
+
+        self.__view = ttk.Frame(self)
+        self.__view.grid(row=0, column=0)
+        self.__view['padding'] = (10, 10, 10, 10)
+        ttk.Label(self.__view, text='Type in your master password.\nDo not forget this!'
+        ).grid(row=0, column=0)
+        ttk.Entry(
+            self.__view, show='*', textvariable=self.__passwd
+        ).grid(row=1, column=0)
+
+        self.__button_frame = ttk.Frame(self.__view)
+        self.__button_frame.grid(row=2, column=0)
+        ttk.Button(
+            self.__button_frame, text='Submit', command=self.__submit_callback
+        ).grid(row=0, column=0)
+        ttk.Button(
+            self.__button_frame, text='Cancel', command=self.__cancel_callback
+        ).grid(row=0, column=1)
+
+
+    def __submit_callback(self):
+        self.__submit = True
+        self.destroy()
+
+
+    def __cancel_callback(self):
+        self.destroy()
+
+
+    def get(self):
+        '''Get user's input.
+
+        Returns
+            A str variable containing user's input, or None if user clicked 'Cancel'.
+        '''
+        self.wait_window(self)
+        if self.__submit:
+            return self.__passwd.get()
+        return None
