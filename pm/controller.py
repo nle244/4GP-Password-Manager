@@ -61,8 +61,15 @@ class Controller:
             self.__ui.show_error('Error while saving database!')
 
 
-    def load(self):
-        '''Tell Storage to load database from disk.'''
+    def load(self, ask_passwd=False):
+        '''Tell Storage to load database from disk.
+
+        Params
+            ask_passwd: if True, ask the user for their master password.
+        '''
+        if ask_passwd:
+            if not self.__get_password():
+                return
         try:
             self.__storage.load()
             self.__populate_table()
@@ -70,6 +77,31 @@ class Controller:
             self.__ui.show_error(str(e))
         except FileNotFoundError as e:
             self.__ui.show_error(str(e))
+
+
+    def new_database(self, filename):
+        '''Ask for user's password and tell Storage to create a new database.
+
+        Params
+            filename: str object containing the database file name.
+        '''
+        if self.__get_password():
+            self.set_filename(filename)
+            self.save()
+            self.load()
+
+
+    def __get_password(self):
+        '''Display a password dialog to get user's master password.
+
+        Returns
+            True if successful, False otherwise.
+        '''
+        passwd = self.__ui.show_password_dialog()
+        if passwd == None:
+            return False
+        self.__storage.set_password(passwd)
+        return True
 
 
     def __populate_table(self):
@@ -85,3 +117,5 @@ class Controller:
             fname: Filename.
         '''
         self.__storage.filename = fname
+
+
