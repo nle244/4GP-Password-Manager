@@ -1,5 +1,5 @@
 import pytest
-import csv
+from unittest.mock import patch
 
 from pm.storage import Storage, HEADER
 from pm import exceptions
@@ -22,7 +22,7 @@ class Test_Storage_filename:
 class Test_Storage_load:
     temp_db = [
         {header: '{} test value {}'.format(header, i) for header in HEADER}
-        for i in range(3)
+        for i in range(5)
     ]
 
     def test_load_fail(self, mvc, tmp_path, filename):
@@ -59,7 +59,7 @@ class Test_Storage_load:
 
         # check it
         for entry in storage.db:
-            assert entry in self.temp_db
+            assert storage.db[entry] in self.temp_db
 
 
 class Test_Storage_add_entry:
@@ -91,4 +91,5 @@ class Test_Storage_add_entry:
 
         # shouldn't raise any exceptions
         storage.add_entry(self.correct)
-        assert storage.db[-1] == self.correct
+        for key in storage.db:
+            assert storage.db[key] == self.correct

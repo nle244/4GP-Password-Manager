@@ -111,13 +111,17 @@ class MainWindow(ttk.Frame):
         self.test_table.heading("URL", text="URL", anchor=tk.CENTER)
         self.test_table.heading("Last_Modified", text="Last_Modified", anchor=tk.CENTER)
 
-        for row in db:
-            title = row['Title']
-            username = row['Username']
-            password = row['Password']
-            url = row['URL']
-            last_modified = row['Last_Modified']
-            self.test_table.insert("", tk.END, values=(title, username, password, url, last_modified))
+        for key in db:
+            entry = [
+                db[key]['Title'],
+                db[key]['Username'],
+                db[key]['Password'],
+                db[key]['URL'],
+                db[key]['Last_Modified']
+            ]
+            if self.test_table.exists(key):
+                self.test_table.delete(key)
+            self.test_table.insert("", tk.END, iid=key, values=entry)
 
         toolbar = ttk.Frame(self)
         eimg = PhotoImage(file='plus.png')
@@ -207,12 +211,11 @@ class MainWindow(ttk.Frame):
         
         #Obtains the user input and stores the values into a Dictionary entry to pass to Controller add_entry
         def get_input():
-            date = str(datetime.now())
             form_fields["Title"] = titleentry.get()
             form_fields["Username"] = userentry.get()
             form_fields["Password"] = passentry.get()
             form_fields["URL"] = urlentry.get()
-            form_fields["Last_Modified"] = date
+            form_fields["Last_Modified"] = str(datetime.now())
 
         
 
@@ -230,12 +233,7 @@ class MainWindow(ttk.Frame):
         newwin.geometry("300x150")
         newwin.focus()
         iid = self.test_table.focus()
-        selected = self.test_table.item(iid)['values']
 
-        entry = dict()
-        for key, value in zip(self.test_table['columns'], selected):
-                entry[key] = str(value)
-        
         form_fields = dict()
 
         
@@ -264,7 +262,7 @@ class MainWindow(ttk.Frame):
 
         
 
-        submitButton = ttk.Button(newwin, text="Submit", command= lambda:[get_input(),self.__ctrl.edit_entry(entry, form_fields), self.show_info('Entry has been updated.'), newwin.destroy()])
+        submitButton = ttk.Button(newwin, text="Submit", command= lambda:[get_input(),self.__ctrl.edit_entry(iid, form_fields), self.show_info('Entry has been updated.'), newwin.destroy()])
         submitButton.grid(row=5, column=0, pady= 5)
 
         cancelButton = ttk.Button(newwin, text="Cancel", command=lambda:[newwin.destroy()])
@@ -274,18 +272,14 @@ class MainWindow(ttk.Frame):
     def delete_entry(self):
         iid = self.test_table.focus()
         selected = self.test_table.item(iid)['values']
-        entry = dict()
-
-        for key, value in zip(self.test_table['columns'], selected):
-                entry[key] = value
 
         confirm = messagebox.askyesno(
             title='Confirm',
-            message = 'Are you sure you want to delete this entry?'
+            message = 'Are you sure you want to delete "{}" entry?'.format(selected[0])
         )
 
         if confirm:
-            self.ctrl.delete_entry(entry)
+            self.ctrl.delete_entry(iid)
         
             
 

@@ -1,6 +1,7 @@
 import os
 import pickle
 import gc
+import uuid
 
 from pm.cryptography import Cryptography
 from pm.exceptions import (
@@ -20,7 +21,7 @@ class Storage:
 
     def __init__(self, filename=None):
         self.filename = filename
-        self.__plaintext_db = []            # populated only with @encryption
+        self.__plaintext_db = {}            # populated only with @encryption
         self.__crypto = Cryptography()
         self.__db = b''
 
@@ -75,32 +76,35 @@ class Storage:
         Raises
             InvalidColumns if the column values are wrong.
         '''
-        if sorted(entry.keys()) == sorted(HEADER):
-            self.__plaintext_db.append(entry)
+        keys = entry.keys()
+
+        if sorted(keys) == sorted(HEADER):
+            self.__plaintext_db[str(uuid.uuid1())] = entry
         else:
-            msg = ' '.join(entry.keys())
+            msg = ' '.join(keys)
             raise InvalidColumns('Invalid column values: {}'.format(msg))
 
 
     @encryption
-    def delete_entry(self, entry: dict):
+    def delete_entry(self, iid: str):
         '''Delete an existing entry from the database in memory.
         Params
             entry: Dictionary containing the entry to delete.
         '''
-        self.__plaintext_db.remove(entry)
+        for row in self.__plaintext_db:
+            print(row)
+        self.__plaintext_db.pop(iid)
 
 
     @encryption
-    def edit_entry(self, old_entry: dict, new_entry: dict):
+    def edit_entry(self, iid: str, new_entry: dict):
         '''Edit an existing entry.
 
         Params
             old_entry: Dictionary containing an existing entry.
             new_entry: Dictionary containing values to replace old_entry with.
         '''
-        idx = self.__plaintext_db.index(old_entry)
-        self.__plaintext_db[idx] = new_entry
+        self.__plaintext_db[iid] = new_entry
 
 
     def load(self):
@@ -130,7 +134,7 @@ class Storage:
         '''Save the database to disk. Creates a new file if it doesn't exist already.'''
         # saving for the first time?
         if self.__db == b'':
-            self.__db = self.__crypto.encrypt(pickle.dumps([]))
+            self.__db = self.__crypto.encrypt(pickle.dumps({}))
 
         # just write it as raw bytes
         with open(self.filename, 'wb') as f:
@@ -148,8 +152,8 @@ class Storage:
 
     @encryption
     def __check_header(self):
-        if len(self.__db) > 0:
-            keys = [row.keys() for row in self.__plaintext_db]
-            for key in keys:
-                if sorted(key) != sorted(HEADER):
-                    raise InvalidFileFormat('Unexpected database header values.')
+        entries = self.__plaintext_db.values()
+        keys = [entry.keys() for entry in entries]
+        for key in keys:
+            if sorted(key) != sorted(HEADER):
+                raise InvalidFileFormat('Unexpected database header values.')

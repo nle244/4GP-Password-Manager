@@ -33,22 +33,22 @@ class Controller:
             self.__ui.show_error(str(e))
 
 
-    def delete_entry(self, entry: dict):
+    def delete_entry(self, iid: str):
         '''Tell Storage to delete an existing entry.
         Params
             entry: Dictionary containing the entry to delete.
         '''
-        self.__storage.delete_entry(entry)
+        self.__storage.delete_entry(iid)
         self.__populate_table()
 
 
-    def edit_entry(self, old_entry: dict, new_entry: dict):
+    def edit_entry(self, iid: str, new_entry: dict):
         '''Tell Storage to edit an existing entry.
         Params
             old_entry: Dictionary containing an existing entry.
             new_entry: Dictionary containing values to replace old_entry with.
         '''
-        self.__storage.edit_entry(old_entry, new_entry)
+        self.__storage.edit_entry(iid, new_entry)
         self.__populate_table()
 
 
