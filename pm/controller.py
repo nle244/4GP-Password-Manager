@@ -20,36 +20,48 @@ class Controller:
         self.__storage = storage
 
 
-    def add_entry(self, entry: dict):
+    def add_entry(self):
         '''Tell Storage to add a new entry to the database in memory.
         Tell MainWindow to render an error message if column values are wrong.
         Params
             entry: Dictionary containing a new entry.
         '''
-        try:
-            self.__storage.add_entry(entry)
-            self.__populate_table()
-        except InvalidColumns as e:
-            self.__ui.show_error(str(e))
+        entry = self.__ui.show_entry_dialog()
+        if entry:
+            try:
+                self.__storage.add_entry(entry)
+                self.__populate_table()
+            except InvalidColumns as e:
+                self.__ui.show_error(str(e))
 
 
-    def delete_entry(self, iid: str):
+    def delete_entry(self):
         '''Tell Storage to delete an existing entry.
         Params
             entry: Dictionary containing the entry to delete.
         '''
-        self.__storage.delete_entry(iid)
-        self.__populate_table()
+        iid = self.__ui.get_iid()
+        if iid:
+            title = self.__storage.get_entry(iid)['Title']
+            confirm = self.__ui.show_confirm('Delete "{}" entry?'.format(title))
+            if confirm:
+                self.__storage.delete_entry(iid)
+                self.__populate_table()
 
 
-    def edit_entry(self, iid: str, new_entry: dict):
+    def edit_entry(self):
         '''Tell Storage to edit an existing entry.
         Params
             old_entry: Dictionary containing an existing entry.
             new_entry: Dictionary containing values to replace old_entry with.
         '''
-        self.__storage.edit_entry(iid, new_entry)
-        self.__populate_table()
+        iid = self.__ui.get_iid()
+        if iid:
+            old_entry = self.__storage.get_entry(iid)
+            new_entry = self.__ui.show_entry_dialog(old_values=old_entry)
+            if new_entry:
+                self.__storage.edit_entry(iid, new_entry)
+                self.__populate_table()
 
 
     def get_entry(self, iid: str):
@@ -73,36 +85,44 @@ class Controller:
             self.__ui.show_error('Error while saving database!')
 
 
-    def load(self, ask_passwd=False):
+    def load(self, ask_passwd=True):
         '''Tell Storage to load database from disk.
 
         Params
             ask_passwd: if True, ask the user for their master password.
         '''
-        if ask_passwd:
-            if not self.__get_password('Enter your master password.'):
-                return
-        try:
-            self.__storage.load()
-            self.__populate_table()
-        except InvalidFileFormat as e:
-            self.__ui.show_error(str(e))
-        except FileNotFoundError as e:
-            self.__ui.show_error(str(e))
-        except ValueError as e:
-            self.__ui.show_error(str(e))
+        filename = self.__ui.show_load_dialog()
+        if filename:
+            if ask_passwd:
+                if not self.__get_password('Enter your master password.'):
+                    return
+            self.__storage.filename = filename
+            try:
+                self.__storage.load()
+                self.__populate_table()
+            except InvalidFileFormat as e:
+                self.__ui.show_error(str(e))
+            except FileNotFoundError as e:
+                self.__ui.show_error(str(e))
+            except ValueError as e:
+                self.__ui.show_error(str(e))
 
 
-    def new_database(self, filename):
+    def new_database(self):
         '''Ask for user's password and tell Storage to create a new database.
 
         Params
             filename: str object containing the database file name.
         '''
-        if self.__get_password('Enter your master password.\nDo not forget this!'):
-            self.set_filename(filename)
-            self.save()
-            self.load()
+        filename = self.__ui.show_save_dialog()
+        if filename:
+            password_set = self.__get_password(
+                'Enter your master password.\nDo not forget this!'
+            )
+            if password_set:
+                self.__storage.filename = filename
+                self.save()
+                self.__populate_table()
 
 
     def __get_password(self, message: str):
@@ -121,15 +141,4 @@ class Controller:
     def __populate_table(self):
         '''Tell UI to populate its table view with the database.'''
         db = self.__storage.db
-        self.__ui.create_db_table(db)
-
-
-    def set_filename(self, fname):
-        '''Tell Storage to set the filename.
-
-        Params
-            fname: Filename.
-        '''
-        self.__storage.filename = fname
-
-
+        self.__ui.display_tree_page(db)

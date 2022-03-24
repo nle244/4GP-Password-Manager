@@ -4,7 +4,6 @@ from tkinter import ttk, filedialog, messagebox
 from tkinter import *
 from pathlib import Path
 from datetime import datetime
-from tkinter.filedialog import asksaveasfilename
 
 import platform
 
@@ -20,11 +19,8 @@ HEADER = ['Title', 'Username', 'Password', 'URL', 'Last_Modified']
 class MainWindow(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
-
-        self.__create_home_widgets()
         self.__ctrl = None
 
-    
     @property
     def ctrl(self) -> 'Controller':
         '''Controller.'''
@@ -35,197 +31,49 @@ class MainWindow(ttk.Frame):
     def ctrl(self, controller):
         '''Controller.'''
         self.__ctrl = controller
-    
 
-    #Initial layout just to get started; may need to organize into frames later on
-    def __create_home_widgets(self):
-        self.label1 = ttk.Label(
-            self, 
-            font=("Arial",25), 
-            text="Welcome"
-            )
-        self.label1.grid(row=0, column=0)
-        #label1.place(relx=.5, y= 50, anchor=tk.CENTER)
+        self.__tree_page = TreePage(self, controller)
+        self.__tree_page.grid(row=0, column=0, sticky='nsew')
 
-        self.homebutton1 = ttk.Button(
-            self, 
-            text="New Database", 
-            command = self.newbuttonclick
-            )
-        self.homebutton1.grid(row=1, column=0)
-        #homebutton1.place(x=150, y= 200)
+        self.__home_page = HomePage(self, controller)
+        self.__home_page.grid(row=0, column=0, sticky='nsew')
 
-        self.homebutton2 = ttk.Button(
-            self, 
-            text="Open Database", 
-            command= self.load_filepath
-            )
-        self.homebutton2.grid(row=1, column=1)
-        #homebutton2.place(x =350, y=200)
-
-    
-
-    #Asks for a file to use from user, in this case a database file
-    def load_filepath(self, *args):
-
-        filetypes = (
-            ('Database files', '*.csv'),
-            ('All files', '.*')
-        )
-
-        filename = filedialog.askopenfilename(
-            title='Choose a file.',
-            initialdir=Path.home(),
-            filetypes=filetypes
-        )
-
-        if filename != None and filename != '':
-            self.__ctrl.set_filename(filename)
-            self.ctrl.load(ask_passwd=True)
-
-        
-            
-
-    
-    
-    #Clears home page once database is chosen
-    def clear_frame(self):
-            for widgets in self.winfo_children():
-                        widgets.destroy()
-    
+        self.display_home_page()
 
 
-    #Creates the table view which will read data from the database file once decrypted for use
-    def create_db_table(self, db):
-        self.clear_frame()
-        self.test_table = ttk.Treeview(self)
-        self.test_table['columns'] = ('Title', 'Username', 'Password', 'URL', 'Last_Modified')
-        self.test_table['show'] = 'headings'
-        self.test_table.column("Title", anchor=tk.CENTER, width=50)
-        self.test_table.column("Username", anchor=tk.CENTER, width=80)
-        self.test_table.column("Password", anchor=tk.CENTER, width=80)
-        self.test_table.column("URL", anchor=tk.CENTER, width=100)
-        self.test_table.column("Last_Modified", anchor=tk.CENTER, width=100)
-        self.test_table.heading("Title", text="Title", anchor=tk.CENTER)
-        self.test_table.heading("Username", text="Username", anchor=tk.CENTER)
-        self.test_table.heading("Password", text="Password", anchor=tk.CENTER)
-        self.test_table.heading("URL", text="URL", anchor=tk.CENTER)
-        self.test_table.heading("Last_Modified", text="Last_Modified", anchor=tk.CENTER)
-
-        for key in db:
-            entry = [
-                db[key]['Title'],
-                db[key]['Username'],
-                db[key]['Password'],
-                db[key]['URL'],
-                db[key]['Last_Modified']
-            ]
-            if self.test_table.exists(key):
-                self.test_table.delete(key)
-            self.test_table.insert("", tk.END, iid=key, values=entry)
-
-        toolbar = ttk.Frame(self)
-        eimg = PhotoImage(file='plus.png')
-
-        save_button = ttk.Button(
-            toolbar, 
-            text="Save", 
-            width ="4",
-            command= self.__save_database
-            )
-        save_button.grid(row=0, column=0)
-
-        addButton = ttk.Button(toolbar, 
-        text="Add", 
-        image=eimg,
-        width="3.5", 
-        command=self.add_entry
-        ) #Need a way to get "plus.png" to show to make it look nicer
-        addButton.grid(row=0,column=1)
-
-        editButton = ttk.Button(
-            toolbar, 
-            text="Edit",
-            width="4", 
-            command= self.edit_entry,
-            state = DISABLED
-            )
-        editButton.grid(row=0, column=2)
-
-        deleteButton = ttk.Button(
-            toolbar, 
-            text="Delete" ,
-            width="6", 
-            command= self.delete_entry,
-            state=DISABLED
-            )
-        deleteButton.grid(row=0, column=3)
-
-        def enable_editdelete(event):
-            editButton['state'] = NORMAL
-            deleteButton['state'] = NORMAL
-
-        self.test_table.bind('<<TreeviewSelect>>', enable_editdelete)
-
-        toolbar.grid(row=0,column=0)
-        self.test_table.grid(row=1, column=0, padx=20, pady=20)
-        
-
-    
-
-    #Initialize a new database and save to computer
-    def newbuttonclick(self, *args):
-        default = 'newDatabase.csv'
-        filename = asksaveasfilename(initialfile=default,
-            defaultextension = '.csv', filetypes = [("All Files","*.*")])
-            
-        if filename != None and filename != '':
-            self.ctrl.new_database(filename)
+    def display_home_page(self):
+        '''Display the home page'''
+        self.__tree_page.grid_remove()
+        self.__home_page.grid()
 
 
-    #Saves the database with the current values displayed
-    def __save_database(self):
-        '''Tell Controller to save the database to disk.'''
-        self.__ctrl.save()
+    def display_tree_page(self, db):
+        '''Display the tree page
+        Params
+            db: dictionary of entries to show.
+        '''
+        self.__home_page.grid_remove()
+        self.__tree_page.grid()
+        self.__tree_page.refresh_treeview(db)
 
 
-    #Adds a new entry to the database table using values inputted by the user
-    #Needs some polishing on UI and cleanup in certain parts of function
-    def add_entry(self):
-        entry = EntryDialog(self, edit=False).get()
-        if entry != None:
-            self.ctrl.add_entry(entry)
+    def get_iid(self):
+        '''Return the IID of the currently selected item in Treeview.'''
+        return self.__tree_page.get_iid()
 
 
-    #Edits specified row from the table and update it with new values
-    def edit_entry(self):
-        iid = self.test_table.focus()
-        if iid:
-            old_values = self.ctrl.get_entry(iid)
-            entry = EntryDialog(self, edit=True, old_entry=old_values).get()
-            if entry != None:
-                self.ctrl.edit_entry(iid, entry)
-
-
-    #Deletes specified row from the table and removes its entry from the database
-    def delete_entry(self):
-        iid = self.test_table.focus()
-        selected = self.test_table.item(iid)['values']
-
-        confirm = messagebox.askyesno(
-            title='Confirm',
-            message = 'Are you sure you want to delete "{}" entry?'.format(selected[0])
-        )
-
-        if confirm:
-            self.ctrl.delete_entry(iid)
-        
-            
+    def show_confirm(self, message):
+        '''Show yes/no confirm dialog.
+        Params
+            message: message to show.
+        Returns
+            True if user clicks Yes, False otherwise.
+        '''
+        return messagebox.askyesno(title='Confirm', message=message)
 
    
     def show_error(self, message):
         '''Show an error message dialog.
-
         Params
             message: Message to display in the dialog.
         '''
@@ -234,15 +82,45 @@ class MainWindow(ttk.Frame):
 
     def show_info(self, message):
         '''Show an info dialog.
-
         Params
             message: Message to display in the dialog.
         '''
         messagebox.showinfo('Info', message)
 
 
+    def show_entry_dialog(self, old_values=None):
+        '''Show an entry input dialog.
+        Params
+            old_values=None: dictionary containing old values
+        '''
+        if old_values:
+            return EntryDialog(self, edit=True, old_entry=old_values).get()
+        return EntryDialog(self, edit=False).get()
+
+
+    def show_load_dialog(self):
+        filetypes = (
+            ('CSV files', '*.csv'),
+            ('Quick Key database files', '*.qk'),
+            ('All files', '.*')
+        )
+        filename = filedialog.askopenfilename(
+            title='Choose a file.',
+            initialdir=Path.home(),
+            filetypes=filetypes
+        )
+        return filename
+
+
     def show_password_dialog(self, message):
         return PasswordDialog(self, message).get()
+
+
+    def show_save_dialog(self):
+        default = 'newDatabase.qk'
+        filename = filedialog.asksaveasfilename(initialfile=default,
+            defaultextension = '.qk', filetypes = [("All Files","*.*")])
+        return filename
 
 
 
@@ -319,7 +197,7 @@ class EntryDialog(Toplevel):
 
         self.__setup_root(edit)
         self.__setup_view()
-        self.__setup_widgets(old_entry)
+        self.__setup_widgets()
 
 
     def __setup_view(self):
@@ -341,7 +219,7 @@ class EntryDialog(Toplevel):
             self.title('New Password Entry')
 
 
-    def __setup_widgets(self, old_entry):
+    def __setup_widgets(self):
         width = 25
         pad = 5
 
@@ -395,3 +273,128 @@ class EntryDialog(Toplevel):
             result[HEADER[-1]] = str(datetime.now()).split('.')[0]
             return result
         return None
+
+
+
+class Page(ttk.Frame):
+    def __init__(self, parent, ctrl):
+        super().__init__(parent)
+        self.__ctrl = ctrl
+
+    @property
+    def ctrl(self) -> 'Controller':
+        return self.__ctrl
+
+
+    @ctrl.setter
+    def ctrl(self, other):
+        self.__ctrl = other
+
+
+    def show(self):
+        self.tkraise()
+
+
+
+class HomePage(Page):
+    def __init__(self, parent, ctrl=None):
+        super().__init__(parent, ctrl)
+        self.__setup_banner()
+        self.__setup_buttons()
+
+
+    def __setup_banner(self):
+        ttk.Label(
+            self, font=("Arial",25), text="Quick Key"
+        ).grid(row=0, column=0)
+
+
+    def __setup_buttons(self):
+        button_frame = ttk.Frame(self)
+        button_frame.grid(row=1, column=0, sticky='we')
+        button_frame.columnconfigure(1, weight=2)
+
+        ttk.Button(
+            button_frame, text="New Database", command=self.ctrl.new_database
+        ).grid(row=0, column=0)
+        ttk.Frame(button_frame).grid(row=0, column=1)
+        ttk.Button(
+            button_frame, text="Open Database",
+            command=lambda: self.ctrl.load(ask_passwd=True)
+        ).grid(row=0, column=2)
+
+
+
+class TreePage(Page):
+    def __init__(self, parent, ctrl=None):
+        super().__init__(parent, ctrl)
+
+        self.__setup_treeview()
+        self.__setup_toolbar()
+
+
+    def __setup_treeview(self):
+        self.__tree = ttk.Treeview(self, columns=HEADER, show='headings')
+        self.__tree.grid(row=1, column=0)
+
+        def enable_edit_and_delete(event):
+            if self.__tree.focus():
+                self.__toolbar.children['edit']['state'] = NORMAL
+                self.__toolbar.children['delete']['state'] = NORMAL
+            else:
+                self.__toolbar.children['edit']['state'] = DISABLED
+                self.__toolbar.children['delete']['state'] = DISABLED
+
+        self.__tree.bind('<<TreeviewSelect>>', enable_edit_and_delete)
+
+        for header in HEADER:
+            self.__tree.column(
+                header, width=80, anchor=tk.CENTER
+            )
+            self.__tree.heading(
+                header, text=header.replace('_', ' '), anchor=tk.CENTER
+            )
+
+
+    def __setup_toolbar(self):
+        # setup toolbar
+        self.__toolbar = ttk.Frame(self, padding=(10,10,10,10))
+        self.__toolbar.grid(row=0, column=0, sticky='we')
+        self.__toolbar.columnconfigure(1, weight=2)
+        eimg = PhotoImage(file='plus.png')
+        pad = 5
+        width = 8
+
+        ttk.Button(
+            self.__toolbar, text="Save", width=width,
+            command=self.ctrl.save
+        ).grid(row=0, column=0, padx=pad)
+
+        ttk.Frame(self.__toolbar).grid(row=0, column=1)
+
+        ttk.Button(
+            self.__toolbar, text="Add", image=eimg, width=width,
+            command=self.ctrl.add_entry
+        ).grid(row=0, column=2, padx=pad)
+
+        ttk.Button(
+            self.__toolbar, text="Edit", name='edit', width=width,
+            command=self.ctrl.edit_entry, state = DISABLED
+        ).grid(row=0, column=3, padx=pad)
+
+        ttk.Button(
+            self.__toolbar, text="Delete", name='delete', width=width,
+            command=self.ctrl.delete_entry, state=DISABLED
+        ).grid(row=0, column=4, padx=pad)
+
+
+    def get_iid(self):
+        return self.__tree.focus()
+
+
+    def refresh_treeview(self, db: dict):
+        self.__tree.delete(*self.__tree.get_children())
+        for key in db:
+            entry = list(db[key].values())
+            self.__tree.insert("", tk.END, iid=key, values=entry)
+            del entry
