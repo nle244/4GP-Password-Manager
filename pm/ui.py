@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from pm.controller import Controller
 
 proj_name = 'Password Manager'
+HEADER = ['Title', 'Username', 'Password', 'URL', 'Last_Modified']
 
 #Main window of Password Manager UI
 class MainWindow(ttk.Frame):
@@ -191,82 +192,19 @@ class MainWindow(ttk.Frame):
     #Adds a new entry to the database table using values inputted by the user
     #Needs some polishing on UI and cleanup in certain parts of function
     def add_entry(self):
-        newwin = Toplevel(self)
-        newwin.geometry("300x150")
-        newwin.focus()
-        form_fields = dict()
-
-        Label(newwin, text="Title").grid(row=0, column=0, padx=5)
-        titleentry = Entry(newwin, width = 25)
-        titleentry.grid(row=0, column=1, pady=5)
-        Label(newwin, text="Username").grid(row=1, column=0, padx=5)
-        userentry = Entry(newwin, width = 25)
-        userentry.grid(row=1, column=1, pady=5)
-        Label(newwin, text="Password").grid(row=2, column=0, padx=5)
-        passentry = Entry(newwin, width = 25)
-        passentry.grid(row=2, column=1, pady=5)
-        Label(newwin, text="URL").grid(row=3, column=0, padx=5)
-        urlentry = Entry(newwin, width = 25)
-        urlentry.grid(row=3, column=1, pady=5)
-        
-        #Obtains the user input and stores the values into a Dictionary entry to pass to Controller add_entry
-        def get_input():
-            form_fields["Title"] = titleentry.get()
-            form_fields["Username"] = userentry.get()
-            form_fields["Password"] = passentry.get()
-            form_fields["URL"] = urlentry.get()
-            form_fields["Last_Modified"] = str(datetime.now())
-
-        
-
-        submitButton = ttk.Button(newwin, text="Submit", command= lambda:[get_input(),self.__ctrl.add_entry(form_fields), self.show_info('Entry has been added.'), newwin.destroy()])
-        submitButton.grid(row=5, column=0, pady= 5)
-
-        cancelButton = ttk.Button(newwin, text="Cancel", command=lambda:[newwin.destroy()])
-        cancelButton.grid(row=5, column=2, pady= 5)
+        entry = EntryDialog(self, edit=False).get()
+        if entry != None:
+            self.ctrl.add_entry(entry)
 
 
     #Edits specified row from the table and update it with new values
     def edit_entry(self):
-        
-        newwin = Toplevel(self)
-        newwin.geometry("300x150")
-        newwin.focus()
         iid = self.test_table.focus()
+        if iid:
+            entry = EntryDialog(self, edit=True).get()
+            if entry != None:
+                self.ctrl.edit_entry(iid, entry)
 
-        form_fields = dict()
-
-        
-        Label(newwin, text="Title").grid(row=0, column=0, padx=5)
-        titleentry = Entry(newwin, width = 25)
-        titleentry.grid(row=0, column=1, pady=5)
-        Label(newwin, text="Username").grid(row=1, column=0, padx=5)
-        userentry = Entry(newwin, width = 25)
-        userentry.grid(row=1, column=1, pady=5)
-        Label(newwin, text="Password").grid(row=2, column=0, padx=5)
-        passentry = Entry(newwin, width = 25)
-        passentry.grid(row=2, column=1, pady=5)
-        Label(newwin, text="URL").grid(row=3, column=0, padx=5)
-        urlentry = Entry(newwin, width = 25)
-        urlentry.grid(row=3, column=1, pady=5)
-        
-        #Obtains the user input and stores the values into a Dictionary entry to pass to Controller add_entry
-        def get_input():
-                date = str(datetime.now())
-                form_fields["Title"] = titleentry.get()
-                form_fields["Username"] = userentry.get()
-                form_fields["Password"] = passentry.get()
-                form_fields["URL"] = urlentry.get()
-                form_fields["Last_Modified"] = date
-                
-
-        
-
-        submitButton = ttk.Button(newwin, text="Submit", command= lambda:[get_input(),self.__ctrl.edit_entry(iid, form_fields), self.show_info('Entry has been updated.'), newwin.destroy()])
-        submitButton.grid(row=5, column=0, pady= 5)
-
-        cancelButton = ttk.Button(newwin, text="Cancel", command=lambda:[newwin.destroy()])
-        cancelButton.grid(row=5, column=2, pady= 5)
 
     #Deletes specified row from the table and removes its entry from the database
     def delete_entry(self):
@@ -362,4 +300,97 @@ class PasswordDialog(Toplevel):
         self.wait_window(self)
         if self.__submit:
             return self.__passwd.get()
+        return None
+
+
+
+class EntryDialog(Toplevel):
+
+    def __init__(self, parent, edit=True, old_entry=None):
+        super().__init__(parent)
+        self.__fields = dict()
+        self.__submit = False
+        for header in HEADER:
+            if old_entry == None:
+                self.__fields[header] = StringVar(self)
+            else:
+                self.__fields[header] = StringVar(self, old_entry[header])
+
+        self.__setup_root(edit)
+        self.__setup_view()
+        self.__setup_widgets(old_entry)
+
+
+    def __setup_view(self):
+        self.__view = ttk.Frame(self)
+        self.__view.grid(row=0, column=0)
+
+
+    def __setup_root(self, edit):
+        self.focus()
+        self.resizable(width=False, height=False)
+        self.columnconfigure(0, weight=1)
+
+        if platform.system() == 'Windows':
+            self.attributes('-toolwindow', True)
+
+        if edit:
+            self.title('Edit Entry')
+        else:
+            self.title('New Password Entry')
+
+
+    def __setup_widgets(self, old_entry):
+        width = 25
+        pad = 5
+
+        # setup fields grouping
+        fields_frame = ttk.Frame(self.__view, padding=(10,10,10,10))
+        fields_frame.grid(row=0, column=0)
+
+        for row in range(len(HEADER[:-1])):
+            header = HEADER[row]
+            ttk.Label(
+                fields_frame, text=header.replace('_', ' ')
+            ).grid(row=row, column=0, padx=pad, sticky='e')
+            ttk.Entry(
+                fields_frame, textvariable=self.__fields[header], width=width
+            ).grid(row=row, column=1, padx=pad)
+
+        # setup button grouping
+        button_frame = ttk.Frame(self.__view, padding=(10,10,10,10))
+        button_frame.grid(row=1, column=0, sticky='we')
+        button_frame.columnconfigure(1, weight=2)
+
+        ttk.Button(
+            button_frame, text='Submit', command=self.__submit_callback
+        ).grid(row=0, column=0, sticky='w')
+        ttk.Frame(button_frame).grid(row=0,column=1)
+        ttk.Button(
+            button_frame, text='Cancel', command=self.__cancel_callback
+        ).grid(row=0, column=2, sticky='e')
+
+
+    def __submit_callback(self):
+        self.__submit = True
+        self.destroy()
+
+
+    def __cancel_callback(self):
+        self.destroy()
+
+
+    def get(self):
+        '''Get user's input.
+
+        Returns
+            A dict containing user's input, or None if cancelled.
+        '''
+        self.wait_window(self)
+        if self.__submit:
+            result = {
+                key: self.__fields[key].get() for key in HEADER
+            }
+            result[HEADER[-1]] = str(datetime.now()).split('.')[0]
+            return result
         return None
