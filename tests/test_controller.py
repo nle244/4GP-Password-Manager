@@ -48,7 +48,7 @@ class Test_Controller_load:
         #   - MainWindow.create_db_table() to render the TreeView
         controller.load() 
         storage.load.assert_called_once()
-        mainwindow.create_db_table.assert_called_once()
+        mainwindow.display_tree_page.assert_called_once()
 
 
     def test_load_fail_InvalidFileFormat(self, mvc):
