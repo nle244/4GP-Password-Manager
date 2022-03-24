@@ -91,8 +91,6 @@ class Storage:
         Params
             entry: Dictionary containing the entry to delete.
         '''
-        for row in self.__plaintext_db:
-            print(row)
         self.__plaintext_db.pop(iid)
 
 
@@ -128,6 +126,16 @@ class Storage:
 
         # ensure that headers are intact
         self.__check_header()
+
+
+    @encryption
+    def get_entry(self, iid: str):
+        '''Returns entry with matching iid.
+
+        Params
+            iid: ID string of the entry to get.
+        '''
+        return self.__plaintext_db[iid]
 
 
     def save(self):
