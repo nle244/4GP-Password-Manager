@@ -52,6 +52,18 @@ class Controller:
         self.__populate_table()
 
 
+    def get_entry(self, iid: str):
+        '''Tell storage to fetch an entry with the matching ID.
+
+        Params
+            iid: ID of the entry to look for.
+        '''
+        try:
+            return self.__storage.get_entry(iid)
+        except KeyError:
+            self.__ui.show_error('Internal error: ID {} was not found!'.format(iid))
+
+
     def save(self):
         '''Tell Storage to save the database to disk.'''
         try:

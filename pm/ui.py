@@ -201,7 +201,8 @@ class MainWindow(ttk.Frame):
     def edit_entry(self):
         iid = self.test_table.focus()
         if iid:
-            entry = EntryDialog(self, edit=True).get()
+            old_values = self.ctrl.get_entry(iid)
+            entry = EntryDialog(self, edit=True, old_entry=old_values).get()
             if entry != None:
                 self.ctrl.edit_entry(iid, entry)
 
