@@ -330,6 +330,7 @@ class TreePage(Page):
         super().__init__(parent, ctrl)
 
         self.__setup_treeview()
+        self.__setup_treeview_sorter()
         self.__setup_toolbar()
 
 
@@ -349,10 +350,49 @@ class TreePage(Page):
 
         for header in HEADER:
             self.__tree.column(
-                header, width=80, anchor=tk.CENTER
+                header, width=100, anchor=tk.CENTER
             )
             self.__tree.heading(
                 header, text=header.replace('_', ' '), anchor=tk.CENTER
+            )
+
+
+    def __setup_treeview_sorter(self):
+        # https://stackoverflow.com/questions/1966929/tk-treeview-column-sort
+        def sort_col(tree, col, reverse):
+            # [(column's value, key), ...]
+            sorted_by_col = [
+                (tree.set(key, col), key) for key in tree.get_children()
+            ]
+            sorted_by_col.sort(reverse=reverse)
+
+            if not reverse:
+                tree.heading(col, text=col + ' ▼')
+            else:
+                tree.heading(col, text=col + ' ▲')
+
+            # move entries around to sorted order
+            for index, (val, key) in enumerate(sorted_by_col):
+                tree.move(key, '', index)
+
+            # reset other headings' callbacks
+            for header in HEADER:
+                if header != col:
+                    tree.heading(
+                        header, text=header.replace('_', ' '),
+                        command=lambda _col=header: sort_col(tree, _col, False)
+                    )
+
+            # do the opposite next time for this heading
+            tree.heading(
+                col, command=lambda _col=col: sort_col(tree, _col, not reverse)
+            )
+
+        # assign sort_col callback to all headings
+        for header in HEADER:
+            self.__tree.heading(
+                header, text=header.replace('_', ' '),
+                command=lambda _col=header: sort_col(self.__tree, _col, False)
             )
 
 
