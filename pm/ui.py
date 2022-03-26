@@ -330,8 +330,9 @@ class TreePage(Page):
         super().__init__(parent, ctrl)
 
         self.__setup_treeview()
-        self.__setup_treeview_sorter()
+        self.__setup_sorter()
         self.__setup_toolbar()
+        self.__setup_rightclick_menu()
 
 
     def __setup_treeview(self):
@@ -357,43 +358,46 @@ class TreePage(Page):
             )
 
 
-    def __setup_treeview_sorter(self):
+    def __setup_sorter(self):
         # https://stackoverflow.com/questions/1966929/tk-treeview-column-sort
-        def sort_col(tree, col, reverse):
+        def sort_callback(col, reverse):
             # [(column's value, key), ...]
             sorted_by_col = [
-                (tree.set(key, col), key) for key in tree.get_children()
+                (self.__tree.set(key, col), key) for key in self.__tree.get_children()
             ]
             sorted_by_col.sort(reverse=reverse)
 
             if not reverse:
-                tree.heading(col, text=col + ' ▼')
+                self.__tree.heading(col, text=col + ' ▼')
             else:
-                tree.heading(col, text=col + ' ▲')
+                self.__tree.heading(col, text=col + ' ▲')
 
             # move entries around to sorted order
             for index, (val, key) in enumerate(sorted_by_col):
-                tree.move(key, '', index)
+                self.__tree.move(key, '', index)
 
             # reset other headings' callbacks
             for header in HEADER:
                 if header != col:
-                    tree.heading(
+                    self.__tree.heading(
                         header, text=header.replace('_', ' '),
-                        command=lambda _col=header: sort_col(tree, _col, False)
+                        command=lambda _col=header: sort_callback(_col, False)
                     )
 
             # do the opposite next time for this heading
-            tree.heading(
-                col, command=lambda _col=col: sort_col(tree, _col, not reverse)
+            self.__tree.heading(
+                col, command=lambda _col=col: sort_callback(_col, not reverse)
             )
 
         # assign sort_col callback to all headings
         for header in HEADER:
             self.__tree.heading(
                 header, text=header.replace('_', ' '),
-                command=lambda _col=header: sort_col(self.__tree, _col, False)
+                command=lambda _col=header: sort_callback(_col, False)
             )
+
+        # oh my god
+        self.__sorter = sort_callback
 
 
     def __setup_toolbar(self):
@@ -428,6 +432,84 @@ class TreePage(Page):
         ).grid(row=0, column=4, padx=pad)
 
 
+    def __setup_rightclick_menu(self):
+        self.__menu = RightClickMenu(self.__tree)
+
+        # add add, edit, delete commands
+        self.__menu.configure(
+            Add=self.ctrl.add_entry,
+            Edit=self.ctrl.edit_entry,
+            Delete=self.ctrl.delete_entry
+        )
+        # add separator
+        self.__menu.add_separator()
+
+        # callback: copy value from treeview to clipboard
+        def entry_to_clipboard(key: str):
+            self.clipboard_clear()
+            self.clipboard_append(self.__tree.set(self.get_iid(), key))
+
+        # callback: copy password from database to clipboard
+        def password_to_clipboard():
+            self.clipboard_clear()
+            self.clipboard_append(self.ctrl.get_entry(self.get_iid())['Password']) # type: ignore
+
+        # command: copy username
+        self.__menu.add_command(
+            label='Copy Username', command=lambda: entry_to_clipboard('Username')
+        )
+        # command: copy password
+        self.__menu.add_command(
+            label='Copy Password', command=password_to_clipboard
+        )
+        # command: copy url
+        self.__menu.add_command(
+            label='Copy URL', command=lambda: entry_to_clipboard('URL')
+        )
+        # add separator
+        self.__menu.add_separator()
+
+        # sort
+        self.__menu.add_command(
+            label='Replace this later with rclick_handler'
+        )
+
+        # callback: spawn menu iff right-clicked in a cell,
+        #           also configure the "sort by xyz" option
+        def rclick_handler(event: tk.Event):
+            x, y = event.x, event.y
+            # do nothing unless right-clicking on a cell
+            if self.__tree.identify_region(x, y) != 'cell':
+                return
+
+            # focus on right-click coord
+            iid = self.__tree.identify_row(y)
+            self.__tree.selection_set(iid)
+            self.__tree.focus(iid)
+
+            # set sorter
+            cid = self.__tree.identify_column(x)
+            idx = self.__menu.index(tk.END)
+            if idx:
+                head = self.__tree.column(cid, option='id')
+                self.__menu.entryconfigure(
+                    idx,
+                    label='Sort by {}'.format(head.replace('_', ' ')),
+                    command=lambda: self.__sorter(head, not rclick_handler.reverse)
+                )
+
+            # spawn menu at the "real" xy coords
+            self.__menu.spawn(event.x_root, event.y_root)
+
+            # flip reverse
+            rclick_handler.reverse = not rclick_handler.reverse
+
+        rclick_handler.reverse = False
+
+        # spawn when right-clicked
+        self.__tree.bind('<Button-3>', rclick_handler)
+
+
     def get_iid(self):
         return self.__tree.focus()
 
@@ -438,3 +520,27 @@ class TreePage(Page):
             entry = list(db[key].values())
             self.__tree.insert("", tk.END, iid=key, values=entry)
             del entry
+
+
+
+class RightClickMenu(Menu):
+
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent, tearoff=0, **kwargs)
+
+
+    def configure(self, idx=None, **kwargs):
+        if not idx:
+            for key in kwargs:
+                self.add_command(label=key.replace('_', ' '), command=kwargs[key])
+        else:
+            for key in kwargs:
+                self.insert_command(idx, label=key.replace('_', ' '), command=kwargs[key])
+                idx += 1
+
+
+    def spawn(self, x, y):
+        try:
+            self.tk_popup(x, y)
+        finally:
+            self.grab_release()
