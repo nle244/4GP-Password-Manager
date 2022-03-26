@@ -330,9 +330,9 @@ class TreePage(Page):
         super().__init__(parent, ctrl)
 
         self.__setup_treeview()
-        self.__setup_sorter()
         self.__setup_toolbar()
-        self.__setup_rightclick_menu()
+        sorter = self.__setup_sorter()
+        self.__setup_rightclick_menu(sorter)
 
 
     def __setup_treeview(self):
@@ -396,8 +396,7 @@ class TreePage(Page):
                 command=lambda _col=header: sort_callback(_col, False)
             )
 
-        # oh my god
-        self.__sorter = sort_callback
+        return sort_callback
 
 
     def __setup_toolbar(self):
@@ -432,47 +431,8 @@ class TreePage(Page):
         ).grid(row=0, column=4, padx=pad)
 
 
-    def __setup_rightclick_menu(self):
-        self.__menu = RightClickMenu(self.__tree)
-
-        # add add, edit, delete commands
-        self.__menu.configure(
-            Add=self.ctrl.add_entry,
-            Edit=self.ctrl.edit_entry,
-            Delete=self.ctrl.delete_entry
-        )
-        # add separator
-        self.__menu.add_separator()
-
-        # callback: copy value from treeview to clipboard
-        def entry_to_clipboard(key: str):
-            self.clipboard_clear()
-            self.clipboard_append(self.__tree.set(self.get_iid(), key))
-
-        # callback: copy password from database to clipboard
-        def password_to_clipboard():
-            self.clipboard_clear()
-            self.clipboard_append(self.ctrl.get_entry(self.get_iid())['Password']) # type: ignore
-
-        # command: copy username
-        self.__menu.add_command(
-            label='Copy Username', command=lambda: entry_to_clipboard('Username')
-        )
-        # command: copy password
-        self.__menu.add_command(
-            label='Copy Password', command=password_to_clipboard
-        )
-        # command: copy url
-        self.__menu.add_command(
-            label='Copy URL', command=lambda: entry_to_clipboard('URL')
-        )
-        # add separator
-        self.__menu.add_separator()
-
-        # sort
-        self.__menu.add_command(
-            label='Replace this later with rclick_handler'
-        )
+    def __setup_rightclick_menu(self, sorter):
+        self.__menu = TreePageRightClick(self.__tree, self.ctrl)
 
         # callback: spawn menu iff right-clicked in a cell,
         #           also configure the "sort by xyz" option
@@ -495,7 +455,7 @@ class TreePage(Page):
                 self.__menu.entryconfigure(
                     idx,
                     label='Sort by {}'.format(head.replace('_', ' ')),
-                    command=lambda: self.__sorter(head, not rclick_handler.reverse)
+                    command=lambda: sorter(head, not rclick_handler.reverse)
                 )
 
             # spawn menu at the "real" xy coords
@@ -543,4 +503,57 @@ class RightClickMenu(Menu):
         try:
             self.tk_popup(x, y)
         finally:
-            self.grab_release()
+            pass
+            #self.grab_release()
+
+
+
+class TreePageRightClick(RightClickMenu):
+    def __init__(self, tree, ctrl, **kwargs):
+        super().__init__(tree, **kwargs)
+        self.__tree = tree
+        self.__ctrl = ctrl
+
+        self.__setup_menu()
+
+
+    def __setup_menu(self):
+
+        # add add, edit, delete commands
+        self.configure(
+            Add=self.__ctrl.add_entry,
+            Edit=self.__ctrl.edit_entry,
+            Delete=self.__ctrl.delete_entry
+        )
+        # add separator
+        self.add_separator()
+
+        # callback: copy value from treeview to clipboard
+        def entry_to_clipboard(key: str):
+            self.clipboard_clear()
+            self.clipboard_append(self.__tree.set(self.__tree.focus(), key))
+
+        # callback: copy password from database to clipboard
+        def password_to_clipboard():
+            self.clipboard_clear()
+            self.clipboard_append(self.__ctrl.get_entry(self.__tree.focus())['Password']) # type: ignore
+
+        # command: copy username
+        self.add_command(
+            label='Copy Username', command=lambda: entry_to_clipboard('Username')
+        )
+        # command: copy password
+        self.add_command(
+            label='Copy Password', command=password_to_clipboard
+        )
+        # command: copy url
+        self.add_command(
+            label='Copy URL', command=lambda: entry_to_clipboard('URL')
+        )
+        # add separator
+        self.add_separator()
+
+        # sort
+        self.add_command(
+            label='Replace this later from TreePage'
+        )
