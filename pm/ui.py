@@ -4,6 +4,8 @@ from tkinter import ttk, filedialog, messagebox
 from tkinter import *
 from pathlib import Path
 from datetime import datetime
+import random
+import string
 
 import platform
 
@@ -223,7 +225,7 @@ class EntryDialog(Toplevel):
         width = 25
         pad = 5
 
-        # setup fields grouping
+        # GROUPING: fields
         fields_frame = ttk.Frame(self.__view, padding=(10,10,10,10))
         fields_frame.grid(row=0, column=0)
 
@@ -236,7 +238,20 @@ class EntryDialog(Toplevel):
                 fields_frame, textvariable=self.__fields[header], width=width
             ).grid(row=row, column=1, padx=pad)
 
-        # setup button grouping
+        # callback for random password
+        def rand_passwd():
+            length = random.randint(8, 16)
+            pool = string.ascii_letters + string.punctuation + string.digits
+            self.__fields['Password'].set(
+                ''.join(random.choices(pool, k=length))
+            )
+
+        # random password button
+        ttk.Button(
+            fields_frame, text="↻", width=3, command=rand_passwd
+        ).grid(row=2, column=2)
+
+        # GROUPING: submit/cancel buttons
         button_frame = ttk.Frame(self.__view, padding=(10,10,10,10))
         button_frame.grid(row=1, column=0, sticky='we')
         button_frame.columnconfigure(1, weight=2)
