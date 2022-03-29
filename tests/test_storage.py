@@ -110,6 +110,22 @@ class Test_Storage_delete_entry:
         storage.delete_entry(list(storage.db.keys())[0])    #delete the entry
         assert len(storage.db) == 0                         #dict should be empty
 
+class Test_Storage_edit_entry:
+    old_entry = {header: '{} test value'.format(header) for header in HEADER}
+    new_entry = {header: '{} NEW value'.format(header) for header in HEADER}
 
+    def test_edit_entry_success(self,mvc, tmp_path, filename):
+        storage, mainwindow, controller = mvc
+
+        # set passwd and initialize
+        storage.filename = tmp_path / filename
+        storage.set_password('casual dress')
+        storage.save()
+        storage.load()
+
+        storage.add_entry(self.old_entry)                               #add entry
+        storage.edit_entry(list(storage.db.keys())[0], self.new_entry)  #edit entry
+        for key in storage.db:
+            assert storage.db[key] == self.new_entry
 
 
