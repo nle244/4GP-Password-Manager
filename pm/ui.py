@@ -285,7 +285,7 @@ class EntryDialog(Toplevel):
             result = {
                 key: self.__fields[key].get() for key in HEADER
             }
-            result[HEADER[-1]] = str(datetime.now()).split('.')[0]
+            result[HEADER[-1]] = datetime.now().strftime("%Y-%m-%d, %H:%M")
             return result
         return None
 
