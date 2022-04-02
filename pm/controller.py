@@ -18,6 +18,16 @@ class Controller:
         '''
         self.__ui = ui
         self.__storage = storage
+        self.__unsaved_data = False
+
+    @property
+    def unsaved_data(self) -> 'bool':
+        return self.__unsaved_data
+
+    @unsaved_data.setter
+    def unsaved_data(self, value):
+        self.__unsaved_data = value
+
 
 
     def add_entry(self):
@@ -31,6 +41,7 @@ class Controller:
             try:
                 self.__storage.add_entry(entry)
                 self.__populate_table()
+                self.unsaved_data = True
             except InvalidColumns as e:
                 self.__ui.show_error(str(e))
 
@@ -46,6 +57,7 @@ class Controller:
             confirm = self.__ui.show_confirm('Delete "{}" entry?'.format(title))
             if confirm:
                 self.__storage.delete_entry(iid)
+                self.unsaved_data = True
                 self.__populate_table()
 
 
@@ -61,6 +73,7 @@ class Controller:
             new_entry = self.__ui.show_entry_dialog(old_values=old_entry)
             if new_entry:
                 self.__storage.edit_entry(iid, new_entry)
+                self.unsaved_data = True
                 self.__populate_table()
 
 
@@ -80,6 +93,7 @@ class Controller:
         '''Tell Storage to save the database to disk.'''
         try:
             self.__storage.save()
+            self.unsaved_data = False
             self.__ui.show_info('Save successful.')
         except:
             self.__ui.show_error('Error while saving database!')

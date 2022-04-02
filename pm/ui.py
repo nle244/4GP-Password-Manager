@@ -21,6 +21,7 @@ HEADER = ['Title', 'Username', 'Password', 'URL', 'Last_Modified']
 class MainWindow(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
+        self.__setup_save_before_close(parent)
         self.__ctrl = None
 
     @property
@@ -123,6 +124,32 @@ class MainWindow(ttk.Frame):
         filename = filedialog.asksaveasfilename(initialfile=default,
             defaultextension = '.qk', filetypes = [("All Files","*.*")])
         return filename
+
+    def __setup_save_before_close(self, parent):
+        def on_close():
+            if self.ctrl.unsaved_data:
+                title = 'Unsaved changes'
+                message = 'You have unsaved changes to the database. Would you like to save?'
+                confirm = messagebox.askyesnocancel(title, message)
+
+                #yes - save then close
+                if confirm: 
+                    self.ctrl.save()
+                    parent.destroy()
+
+                #cancel - do nothing
+                elif confirm is None:
+                    return
+
+                #no - just close
+                else:
+                    parent.destroy()
+            else:
+                parent.destroy()
+        
+        #hook into parent protocol 
+        parent.protocol('WM_DELETE_WINDOW', on_close)
+
 
 
 
