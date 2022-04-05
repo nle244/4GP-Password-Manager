@@ -4,6 +4,7 @@ from unittest.mock import Mock
 from pm.storage import Storage
 from pm.controller import Controller
 from pm.ui import MainWindow
+from pm.cryptography import Cryptography
 
 @pytest.fixture
 def mainwindow():
@@ -19,6 +20,11 @@ def storage():
 def controller():
     return Mock(spec=Controller)
 
+
+@pytest.fixture
+def cryptography():
+    return Mock(spec=Cryptography)
+    
 
 @pytest.fixture
 def filename():
