@@ -159,7 +159,6 @@ class PasswordDialog(Toplevel):
         self.__passwd = StringVar()
         self.__msg = message
         self.__submit = False
-
         self.__render()
 
 
@@ -169,6 +168,7 @@ class PasswordDialog(Toplevel):
             self.attributes('-toolwindow', True)
         self.columnconfigure(0, weight=1)
         self.resizable(width=False, height=False)
+        self.bind('<Return>', self.__enter_callback)
 
         self.__view = ttk.Frame(self)
         self.__view.grid(row=0, column=0)
@@ -196,6 +196,11 @@ class PasswordDialog(Toplevel):
 
 
     def __cancel_callback(self):
+        self.destroy()
+
+    
+    def __enter_callback(self, event):
+        self.__submit = True
         self.destroy()
 
 
