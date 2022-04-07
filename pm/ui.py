@@ -103,8 +103,8 @@ class MainWindow(ttk.Frame):
 
     def show_load_dialog(self):
         filetypes = (
-            ('CSV files', '*.csv'),
             ('Quick Key database files', '*.qk'),
+            ('CSV files', '*.csv'),
             ('All files', '.*')
         )
         filename = filedialog.askopenfilename(
