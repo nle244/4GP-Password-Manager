@@ -5,6 +5,7 @@ from tkinter import *
 from pathlib import Path
 from datetime import datetime
 from PIL import Image, ImageTk
+from idlelib.tooltip import Hovertip
 import random
 import string
 
@@ -474,7 +475,7 @@ class TreePage(Page):
         )
         saveButton.image = savesign
         saveButton.grid(row=0, column=0, padx=pad)
-
+        saveTip = Hovertip(saveButton, 'Save')
         ttk.Frame(self.__toolbar).grid(row=0, column=1)
 
 
@@ -484,6 +485,7 @@ class TreePage(Page):
         )
         addButton.image = plussign
         addButton.grid(row=0, column=2, padx=pad)
+        addTip = Hovertip(addButton, 'Add New Entry')
 
         editButton = ttk.Button(
             self.__toolbar, image=editsign, name='edit', width=width,
@@ -491,6 +493,7 @@ class TreePage(Page):
         )
         editButton.image = editsign
         editButton.grid(row=0, column=3, padx=pad)
+        editTip = Hovertip(editButton, 'Edit Entry')
 
         deleteButton = ttk.Button(
             self.__toolbar, image=trashsign, name='delete', width=width,
@@ -498,6 +501,7 @@ class TreePage(Page):
         )
         deleteButton.image= trashsign
         deleteButton.grid(row=0, column=4, padx=pad)
+        deleteTip = Hovertip(deleteButton, 'Delete Entry')
 
 
     def __setup_rightclick_menu(self, sorter):
