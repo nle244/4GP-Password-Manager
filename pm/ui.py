@@ -4,6 +4,7 @@ from tkinter import ttk, filedialog, messagebox
 from tkinter import *
 from pathlib import Path
 from datetime import datetime
+from PIL import Image, ImageTk
 import random
 import string
 
@@ -451,31 +452,52 @@ class TreePage(Page):
         self.__toolbar = ttk.Frame(self, padding=(10,10,10,10))
         self.__toolbar.grid(row=0, column=0, sticky='we')
         self.__toolbar.columnconfigure(1, weight=2)
-        eimg = PhotoImage(file='plus.png')
+        eimg1 = PhotoImage(file='images/plus.png')
+        eimg2 = PhotoImage(file='images/edit.png')
+        eimg3 = PhotoImage(file='images/trash.png')
+        eimg4 = PhotoImage(file='images/new.png')
+        eimg5 = PhotoImage(file='images/save.png')
+        eimg6 = PhotoImage(file='images/open.png')
+        plussign = eimg1.subsample(2,2)
+        editsign = eimg2.subsample(2,2)
+        trashsign = eimg3.subsample(2,2)
+        newsign = eimg4.subsample(2,2)
+        savesign = eimg5.subsample(2,2)
+        openign = eimg6.subsample(2,2)
+
         pad = 5
         width = 8
 
-        ttk.Button(
-            self.__toolbar, text="Save", width=width,
+        saveButton = ttk.Button(
+            self.__toolbar, image=savesign, width=width,
             command=self.ctrl.save
-        ).grid(row=0, column=0, padx=pad)
+        )
+        saveButton.image = savesign
+        saveButton.grid(row=0, column=0, padx=pad)
 
         ttk.Frame(self.__toolbar).grid(row=0, column=1)
 
-        ttk.Button(
-            self.__toolbar, text="Add", image=eimg, width=width,
+
+        addButton = ttk.Button(
+            self.__toolbar,image=plussign, width=width,
             command=self.ctrl.add_entry
-        ).grid(row=0, column=2, padx=pad)
+        )
+        addButton.image = plussign
+        addButton.grid(row=0, column=2, padx=pad)
 
-        ttk.Button(
-            self.__toolbar, text="Edit", name='edit', width=width,
+        editButton = ttk.Button(
+            self.__toolbar, image=editsign, name='edit', width=width,
             command=self.ctrl.edit_entry, state = DISABLED
-        ).grid(row=0, column=3, padx=pad)
+        )
+        editButton.image = editsign
+        editButton.grid(row=0, column=3, padx=pad)
 
-        ttk.Button(
-            self.__toolbar, text="Delete", name='delete', width=width,
+        deleteButton = ttk.Button(
+            self.__toolbar, image=trashsign, name='delete', width=width,
             command=self.ctrl.delete_entry, state=DISABLED
-        ).grid(row=0, column=4, padx=pad)
+        )
+        deleteButton.image= trashsign
+        deleteButton.grid(row=0, column=4, padx=pad)
 
 
     def __setup_rightclick_menu(self, sorter):
