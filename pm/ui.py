@@ -223,6 +223,7 @@ class EntryDialog(Toplevel):
 
     def __init__(self, parent, edit=True, old_entry=None):
         super().__init__(parent)
+        self.grab_set()
         self.__fields = dict()
         self.__submit = False
         for header in HEADER:
