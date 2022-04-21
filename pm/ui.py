@@ -354,9 +354,14 @@ class HomePage(Page):
 
 
     def __setup_banner(self):
-        ttk.Label(
-            self, font=("Arial",25), text="Quick Key"
-        ).grid(row=0, column=0)
+        eimg1 = PhotoImage(file="images/quickkey.png")
+        qklogo = eimg1.subsample(3,3)
+        qklabel = ttk.Label(
+            self, font=("Arial",25), image=qklogo
+        )
+        qklabel.image = qklogo
+        qklabel.grid(row=0, column=0)
+
 
 
     def __setup_buttons(self):
