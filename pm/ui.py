@@ -246,6 +246,7 @@ class EntryDialog(Toplevel):
         self.focus()
         self.resizable(width=False, height=False)
         self.columnconfigure(0, weight=1)
+        self.bind('<Return>', self.__enter_callback)
 
         if platform.system() == 'Windows':
             self.attributes('-toolwindow', True)
@@ -301,6 +302,11 @@ class EntryDialog(Toplevel):
 
 
     def __submit_callback(self):
+        self.__submit = True
+        self.destroy()
+
+
+    def __enter_callback(self, event):
         self.__submit = True
         self.destroy()
 
