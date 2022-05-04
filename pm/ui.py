@@ -389,7 +389,7 @@ class TreePage(Page):
         sorter = self.__setup_sorter()
         self.__setup_rightclick_menu(sorter)
 
-
+    #Sets up the table view
     def __setup_treeview(self):
         self.__tree = ttk.Treeview(self, columns=HEADER, show='headings')
         self.__tree.grid(row=1, column=0)
@@ -455,10 +455,10 @@ class TreePage(Page):
 
 
     def __setup_toolbar(self):
-        # setup toolbar
+        # setup toolbar with basic functions
         self.__toolbar = ttk.Frame(self, padding=(10,10,10,10))
         self.__toolbar.grid(row=0, column=0, sticky='we')
-        self.__toolbar.columnconfigure(1, weight=2)
+        self.__toolbar.columnconfigure(3, weight=2)
         eimg1 = PhotoImage(file='images/plus.png')
         eimg2 = PhotoImage(file='images/edit.png')
         eimg3 = PhotoImage(file='images/trash.png')
@@ -470,11 +470,12 @@ class TreePage(Page):
         trashsign = eimg3.subsample(2,2)
         newsign = eimg4.subsample(2,2)
         savesign = eimg5.subsample(2,2)
-        openign = eimg6.subsample(2,2)
+        opensign = eimg6.subsample(2,2)
 
         pad = 5
         width = 8
 
+        ttk.Frame(self.__toolbar).grid(row=0, column=0)
         saveButton = ttk.Button(
             self.__toolbar, image=savesign, width=width,
             command=self.ctrl.save
@@ -482,7 +483,26 @@ class TreePage(Page):
         saveButton.image = savesign
         saveButton.grid(row=0, column=0, padx=pad)
         saveTip = Hovertip(saveButton, 'Save')
-        ttk.Frame(self.__toolbar).grid(row=0, column=1)
+
+        #New Database button at the Table View is not working properly at the moment, do not use.
+        newButton = ttk.Button(
+            self.__toolbar, image=newsign, width=width,
+            command=self.ctrl.new_database
+        )
+        newButton.image = newsign
+        newButton.grid(row=0, column=1, padx=pad)
+        newTip = Hovertip(newButton, 'Create New Database ((Bugged at the moment! Do not use))')
+
+        openButton = ttk.Button(
+            self.__toolbar, image=opensign, width=width,
+            command=lambda: self.ctrl.load(ask_passwd=True)
+        )
+        openButton.image = opensign
+        openButton.grid(row=0, column=2, padx=pad)
+        openTip = Hovertip(openButton, 'Open Database')
+
+
+        
 
 
         addButton = ttk.Button(
@@ -490,7 +510,7 @@ class TreePage(Page):
             command=self.ctrl.add_entry
         )
         addButton.image = plussign
-        addButton.grid(row=0, column=2, padx=pad)
+        addButton.grid(row=0, column=4, padx=pad)
         addTip = Hovertip(addButton, 'Add New Entry')
 
         editButton = ttk.Button(
@@ -498,7 +518,7 @@ class TreePage(Page):
             command=self.ctrl.edit_entry, state = DISABLED
         )
         editButton.image = editsign
-        editButton.grid(row=0, column=3, padx=pad)
+        editButton.grid(row=0, column=5, padx=pad)
         editTip = Hovertip(editButton, 'Edit Entry')
 
         deleteButton = ttk.Button(
@@ -506,7 +526,7 @@ class TreePage(Page):
             command=self.ctrl.delete_entry, state=DISABLED
         )
         deleteButton.image= trashsign
-        deleteButton.grid(row=0, column=4, padx=pad)
+        deleteButton.grid(row=0, column=6, padx=pad)
         deleteTip = Hovertip(deleteButton, 'Delete Entry')
 
 
