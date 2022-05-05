@@ -155,4 +155,8 @@ class Controller:
     def __populate_table(self):
         '''Tell UI to populate its table view with the database.'''
         db = self.__storage.db
-        self.__ui.display_tree_page(db)
+        db2 = db
+        dbK = db.keys()
+        for keys in dbK:
+            db2[keys]['Password']= '****'
+        self.__ui.display_tree_page(db2)
