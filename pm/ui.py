@@ -497,7 +497,7 @@ class TreePage(Page):
         )
         newButton.image = newsign
         newButton.grid(row=0, column=1, padx=pad)
-        newTip = Hovertip(newButton, 'Create New Database ((Bugged at the moment! Do not use))')
+        newTip = Hovertip(newButton, 'Create New Database')
 
         openButton = ttk.Button(
             self.__toolbar, image=opensign, width=width,
