@@ -25,6 +25,7 @@ jobs:
       uses: actions/setup-python@v2 
       with:
         python-version: ${{ matrix.python-version }} 
+
     - name: Get dependencies for Linux build
       run: |
         python -m pip install --upgrade pip 
@@ -36,7 +37,7 @@ jobs:
         python3 -m PyInstaller QuickKey.spec
 
     - name: Release all 
-    - uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/') 
       with:
         files: |
