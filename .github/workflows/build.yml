@@ -21,7 +21,7 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: QuickKey
-          path: dist/windows
+        path: dist/windows
 
   build-linux: 
     runs-on: ubuntu-latest
