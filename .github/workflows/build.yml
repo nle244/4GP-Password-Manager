@@ -40,6 +40,7 @@ jobs:
     - name: Pack it up for Linux
       run: |
         python3 -m PyInstaller QuickKey.spec
+        chmod +x dist/QuickKey
 
     - name: Release all 
       uses: softprops/action-gh-release@v1
