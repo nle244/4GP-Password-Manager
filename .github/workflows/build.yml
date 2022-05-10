@@ -9,6 +9,9 @@ on:
 jobs:
   build-windows: 
     runs-on: ubuntu-latest 
+    strategy:
+      matrix:
+        python-version: [ 3.9 ]
 
     steps: 
     - uses: actions/checkout@v2 
@@ -25,17 +28,24 @@ jobs:
 
   build-linux: 
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ 3.9 ]
 
     steps:
-      - uses: actions/checkout@v2
-
-      - name: install libjpeg 
-        run: sudo apt install -y libjpeg-dev zlib1g-dev
+      - name: Get Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2 
+        with:
+          python-version: ${{ matrix.python-version }} 
+      - name: Get dependencies 
+        run: |
+          python -m pip install --upgrade pip 
+          pip install -r requirements.txt
+          pip install pyinstaller
 
       - name: Pack it up for Linux
-        uses: JackMcKew/pyinstaller-action-linux@main
-        with:
-          path: .
+        run: |
+          python -m pyinstaller 
 
       - uses: actions/upload-artifact@v2 
         with: 
