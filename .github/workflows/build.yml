@@ -29,6 +29,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: install libjpeg 
+        run: apt-get install libjpeg
+
       - name: Pack it up for Linux
         uses: JackMcKew/pyinstaller-action-linux@main
         with:
