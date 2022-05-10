@@ -8,6 +8,7 @@ from PIL import Image, ImageTk
 from idlelib.tooltip import Hovertip
 import random
 import string
+import sys, os
 
 import platform
 
@@ -18,6 +19,16 @@ if TYPE_CHECKING:
 
 proj_name = 'Password Manager'
 HEADER = ['Title', 'Username', 'Password', 'URL', 'Last_Modified']
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 #Main window of Password Manager UI
 class MainWindow(ttk.Frame):
@@ -360,7 +371,7 @@ class HomePage(Page):
 
 
     def __setup_banner(self):
-        eimg1 = PhotoImage(file="images/quickkey.png")
+        eimg1 = PhotoImage(file=resource_path("images/quickkey.png"))
         qklogo = eimg1.subsample(3,3)
         qklabel = ttk.Label(
             self, font=("Arial",25), image=qklogo
@@ -465,12 +476,12 @@ class TreePage(Page):
         self.__toolbar = ttk.Frame(self, padding=(10,10,10,10))
         self.__toolbar.grid(row=0, column=0, sticky='we')
         self.__toolbar.columnconfigure(3, weight=2)
-        eimg1 = PhotoImage(file='images/plus.png')
-        eimg2 = PhotoImage(file='images/edit.png')
-        eimg3 = PhotoImage(file='images/trash.png')
-        eimg4 = PhotoImage(file='images/new.png')
-        eimg5 = PhotoImage(file='images/save.png')
-        eimg6 = PhotoImage(file='images/open.png')
+        eimg1 = PhotoImage(file=resource_path('images/plus.png'))
+        eimg2 = PhotoImage(file=resource_path('images/edit.png'))
+        eimg3 = PhotoImage(file=resource_path('images/trash.png'))
+        eimg4 = PhotoImage(file=resource_path('images/new.png'))
+        eimg5 = PhotoImage(file=resource_path('images/save.png'))
+        eimg6 = PhotoImage(file=resource_path('images/open.png'))
         plussign = eimg1.subsample(2,2)
         editsign = eimg2.subsample(2,2)
         trashsign = eimg3.subsample(2,2)

@@ -6,7 +6,7 @@ block_cipher = None
 
 a = Analysis(
     ['pm.py'],
-    pathex=['./'],
+    pathex=[],
     binaries=[],
     datas=[('images', 'images')],
     hiddenimports=[],
