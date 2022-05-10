@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Pack it up for Linux
-        uses: JackMcKew/pyinstaller-action-linux@tkinter
+        uses: JackMcKew/pyinstaller-action-linux@main
         with:
           path: .
 
