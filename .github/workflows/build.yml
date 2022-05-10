@@ -47,7 +47,7 @@ jobs:
 
       - name: Pack it up for Linux
         run: |
-          python3 -m pyinstaller 
+          python3 -m PyInstaller QuickKey.spec
 
       - uses: actions/upload-artifact@v2 
         with: 
