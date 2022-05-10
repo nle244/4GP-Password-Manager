@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: install libjpeg 
-        run: apt-get install libjpeg
+        run: sudo apt-get install -y libjpeg
 
       - name: Pack it up for Linux
         uses: JackMcKew/pyinstaller-action-linux@main
