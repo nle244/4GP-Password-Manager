@@ -23,8 +23,8 @@ jobs:
 
     - name: Move the executable somewhere else 
       run: |
-        mv dist/QuickKey.exe ./
-        rm -rf dist
+        mv dist/windows/QuickKey.exe ./
+        sudo rm -rf dist
 
     - name: Get Python ${{ matrix.python-version }} for Linux build
       uses: actions/setup-python@v2 
