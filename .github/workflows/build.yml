@@ -1,0 +1,40 @@
+name: Build application with Pyinstaller 
+
+on: 
+  push:
+    branches: [ austin ]
+  pull_request: 
+    branches: [ austin ] 
+
+jobs:
+  build-windows: 
+    runs-on: ubuntu-latest 
+
+    steps: 
+    - uses: actions/checkout@v2 
+
+    - name: Pack it up for Windows
+      uses: JackMcKew/pyinstaller-action-windows@main 
+      with:
+        path: .
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: QuickKey
+          path: dist/windows
+
+  build-linux: 
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Pack it up for Linux
+        uses: JackMcKew/pyinstaller-action-linux@tkinter
+        with:
+          path: .
+
+      - uses: actions/upload-artifact@v2 
+        with: 
+          name: QuickKey 
+          path: dist/linux
