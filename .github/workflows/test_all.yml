@@ -1,7 +1,12 @@
-name: 4gp-password-manager
-on: [ push, pull_request ]
+name: Test all modules
+on: 
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
+
 jobs:
-  build:
+  test-all:
     runs-on: ubuntu-latest 
     strategy:
       matrix: 
