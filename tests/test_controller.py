@@ -43,6 +43,9 @@ class Test_Controller_load:
     def test_load_success(self, mainwindow, storage):
         controller = Controller(mainwindow, storage)
 
+        # init storage's database as an empty dict
+        storage.db = {}
+
         # Controller.load() success process:
         #   - Storage.load() to load the file
         #   - MainWindow.create_db_table() to render the TreeView
