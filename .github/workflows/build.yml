@@ -47,7 +47,7 @@ jobs:
 
       - name: Pack it up for Linux
         run: |
-          python -m pyinstaller 
+          python3 -m pyinstaller 
 
       - uses: actions/upload-artifact@v2 
         with: 
